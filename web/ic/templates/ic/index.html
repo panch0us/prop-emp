@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Главная страница</title>
+</head>
+<body>
+    <header>
+        <br><br><br>
+        <hr>
+    </header>
+    <nav>
+        навигация... <br>
+        навигация... <br>
+        навигация... <br>
+    </nav>
+    <main>
+        <h3>Дни рождения в текущем месяце:</h3>
+    {% for emp_bm in employees %}
+    {% if emp_bm.emp_birthday.month == current_month %}
+    <div>
+        {{ emp_bm.emp_surname }} - {{ emp_bm.emp_birthday }}
+    </div>
+    {% endif %}
+    {% endfor %}
+    </main>
+
+</body>
+<footer>
+    <hr>
+    <center><h5>Текущая дата и время: {% now "SHORT_DATETIME_FORMAT" %}</h5></center>
+</footer>
+</html>
