@@ -1,10 +1,26 @@
 from django.db import models
 
 
+class TypesProperty(models.Model):
+    """Вид имущества"""
+    tp_id = models.AutoField(primary_key=True)
+    tp_type = models.CharField(unique=True, max_length=100, verbose_name='Вид имущества')
+    tp_note = models.TextField(blank=True, null=True, verbose_name='Примечание')
+
+    def __str__(self):
+        return self.tp_type
+
+    class Meta:
+        verbose_name_plural = 'Виды имущества'
+        verbose_name = 'Вид имущества'
+        db_table = 'types_property'
+
+
 class Cabinets(models.Model):
     """Кабинеты"""
     cab_id = models.AutoField(primary_key=True)
     cab_num = models.CharField(unique=True, max_length=30, verbose_name='Номер/Название кабинета')
+    cab_note = models.TextField(blank=True, null=True, verbose_name='Примечание')
 
     def __str__(self):
         return self.cab_num
@@ -13,6 +29,62 @@ class Cabinets(models.Model):
         verbose_name_plural = 'Кабинеты'
         verbose_name = 'Кабинет'
         db_table = 'cabinets'
+
+
+class PropertyStandarts(models.Model):
+	"""Нормы положенности имущества ИЦ"""
+	KINDS_TYPES_PROPERTY = (('Средства связи','Средства связи'), ('Средства вычислительной техники', 'Средства вычислительной техники'),
+						    ('Средства электронной организационной техники','Средства электронной организационной техники'),
+						    ('Специальная техника','Специальная техника'))
+
+	ps_id = models.AutoField(primary_key=True)
+	ps_name = models.CharField(unique=True, max_length=250, verbose_name='Наименование имущества')
+	ps_type = models.CharField(blank=True, null=True, max_length=50, choices=KINDS_TYPES_PROPERTY,
+							   verbose_name='Тип имущества')
+	ps_quantity_limit = models.IntegerField(blank=True, null=True, verbose_name='Количество положенного имущества')
+	ps_note = models.TextField(blank=True, null=True, verbose_name='Примечание')
+
+	def __str__(self):
+		return self.ps_name
+
+	class Meta:
+		verbose_name_plural = 'Нормы положенности'
+		verbose_name = 'Норма положенности'
+		db_table = 'property_standarts'
+
+
+class Property(models.Model):
+	"""Имущество ИЦ"""
+	# выбор вариантов из указанного кортежа
+	KINDS_UNITS_MEASURES = (('Комплект', 'Комплект'), ('Штука', 'Штука'))
+	KINDS_STATUS = (('Исправно','Исправно'), ('Неисправно','Неисправно'))
+
+	prop_id = models.AutoField(primary_key=True)
+	fk_tp = models.ForeignKey(TypesProperty, db_column='fk_tp', on_delete=models.SET_NULL, blank=True, null=True,
+		    				  verbose_name='Вид имущества внутренний')
+	fk_ps = models.ForeignKey(PropertyStandarts, db_column='fk_ps', on_delete=models.SET_NULL, blank=True, null=True,
+                              verbose_name='Вид имущества по нормам положенности')
+	prop_name = models.CharField(max_length=250, verbose_name='Наименование имущества')
+	prop_ic_num = models.CharField(unique=True, max_length=50, verbose_name='Учетный номер в ИЦ')
+	prop_inventory_num = models.CharField(unique=True, max_length=250, verbose_name='Номер учета УМВД (инв. номер)')
+	prop_factory_num = models.CharField(max_length=250, verbose_name='Заводской/серийный номер')
+	prop_unit_measure = models.CharField(max_length=50, choices=KINDS_UNITS_MEASURES,
+									     verbose_name='Единица измерения')
+	fk_prop_owner = models.ForeignKey('Employees', db_column='fk_prop_owner', on_delete=models.SET_NULL,
+                                      blank=True, null=True, verbose_name='Владелец имущества')
+	fk_cabinet_location = models.ForeignKey(Cabinets, db_column='fk_cabinet_location', on_delete=models.SET_NULL,
+                                            blank=True, null=True, verbose_name='Кабинет')
+	prop_date_exploitation = models.DateField(blank=True, null=True, verbose_name='Дата начала эксплуатации')
+	prop_status = models.CharField(max_length=100, choices=KINDS_STATUS, verbose_name='Состояние имущества')
+	prop_note = models.TextField(blank=True, null=True, verbose_name='Примечание')
+
+	def __str__(self):
+		return '№' + str(self.prop_id) + ' - ' + str(self.prop_name)
+
+	class Meta:
+		verbose_name_plural = 'Имущество'
+		verbose_name = 'Имущество'
+		db_table = 'property'
 
 
 class TypesWork(models.Model):
@@ -86,12 +158,20 @@ class Positions(models.Model):
     fk_division = models.ForeignKey(Divisions, db_column='fk_division', on_delete=models.SET_NULL, blank=True,
                                     null=True, verbose_name='Подразделение')
     pos_quantity = models.IntegerField(blank=True, null=True,
-                                       verbose_name='Количество должностей по штатной численности')
+                                       verbose_name='Кол-во должностей по ШР')
     fk_types_work = models.ForeignKey(TypesWork, db_column='fk_types_work', on_delete=models.SET_NULL, blank=True,
                                       null=True, verbose_name='Вид службы')
 
     def __str__(self):
-        return self.pos_title
+    	# Если сотрудник не входит в отделение и не входит в отдел, то должность пишется без отделений и отделов
+    	if self.fk_dep_second == None and self.fk_dep_first == None:
+    		return str(self.pos_title)
+    	# Если сотрудник не входит в отделение, НО входит в отдел, то должность пишется без отделений, но с отделом
+    	elif self.fk_dep_second == None and self.fk_dep_first != None:
+    		return str(self.fk_dep_first) + ', ' + str(self.pos_title)
+    	# Если сотрудник и в отделении и в отделе - пишется полная должность с названиями отделений и отделов
+    	else:
+       		return str(self.fk_dep_first) + ', ' + str(self.fk_dep_second) + ', ' + str(self.pos_title)
 
     class Meta:
         verbose_name_plural = 'Должности'
@@ -124,8 +204,10 @@ class Employees(models.Model):
                                       null=True, verbose_name='Статус сотрудника')
     fk_position = models.ForeignKey(Positions, db_column='fk_position', on_delete=models.SET_NULL, blank=True,
                                     null=True, verbose_name='Должность')
-    fk_types_work = models.ForeignKey(TypesWork, db_column='fk_types_work', on_delete=models.SET_NULL, blank=True,
-                                      null=True, verbose_name='Вид службы')
+    fk_cabinet_location = models.ForeignKey(Cabinets, db_column='fk_cabinet_location', on_delete=models.SET_NULL,
+                                            blank=True, null=True, verbose_name='Кабинет')
+    emp_phone = models.CharField(max_length=50, blank=True, null=True, verbose_name='Телефон')
+    emp_note = models.TextField(blank=True, null=True, verbose_name='Примечание')
 
     def __str__(self):
         return '№' + str(self.emp_id) + ' - ' + str(self.emp_surname) + ' ' + str(self.emp_name) + ' ' \
@@ -139,22 +221,21 @@ class Employees(models.Model):
 
 class ComputersIsod(models.Model):
     """Компьютеры для работы в сети ИСОД МВД"""
+    # выбор вариантов из указанного кортежа
     KINDS_ATTESTATION = (('Присоединен', 'Присоединен'), ('Требует присоединения', 'Требует присоединения'))
 
     comp_id = models.AutoField(primary_key=True)
     comp_reg_num = models.CharField(max_length=10, verbose_name='Регистрационный номер')
-    comp_factory_num = models.CharField(max_length=10, verbose_name='Заводской номер')
     comp_mac_address = models.CharField(max_length=100, verbose_name='МАС адрес сетевой карты')
     comp_ip_address = models.GenericIPAddressField(verbose_name='IP-адрес')
     comp_virt_ip_address = models.GenericIPAddressField(verbose_name='Виртуальный IP-адрес')
     comp_id_dst_file = models.CharField(max_length=100, verbose_name='ID DST')
     comp_title_dst_file = models.CharField(max_length=100, verbose_name='Имя DST')
-    fk_cabinet_location = models.ForeignKey(Cabinets, db_column='fk_cabinet_location', on_delete=models.SET_NULL,
-                                            blank=True, null=True, verbose_name='Кабинет')
-    fk_comp_owner = models.ForeignKey(Employees, db_column='fk_comp_owner', on_delete=models.SET_NULL,
-                                      blank=True, null=True, verbose_name='Владелец')
+    fk_prop = models.ForeignKey(Property, db_column='fk_prop', on_delete=models.SET_NULL,
+                                      blank=True, null=True, verbose_name='Имущество')
     comp_attestation_status = models.CharField(max_length=100, choices=KINDS_ATTESTATION,
                                                verbose_name='Состояние аттестации')
+    comp_note = models.TextField(blank=True, null=True, verbose_name='Примечание')
 
     def __str__(self):
         return self.comp_reg_num
@@ -176,6 +257,7 @@ class DiskStorageIsod(models.Model):
                                       on_delete=models.SET_NULL, blank=True, null=True, verbose_name='Владелец')
     fk_install_in_comp = models.ForeignKey(ComputersIsod, db_column='fk_install_in_comp', on_delete=models.SET_NULL,
                                       blank=True, null=True, verbose_name='Установлен в компьютер')
+    disk_note = models.TextField(blank=True, null=True, verbose_name='Примечание')
 
     def __str__(self):
         return self.disk_reg_num
