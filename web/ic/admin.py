@@ -1,13 +1,21 @@
 from django.contrib import admin
 
 from .models import Cabinets, TypesWork, Divisions, DepartmentsFirst, DepartmentsSecond, Positions, EmployeesStatus, \
-                    Employees, ComputersIsod, DiskStorageIsod, PropertyStandarts, Property, TypesProperty
+                    Employees, ComputersIsod, DiskStorageIsod, PropertyStandarts, Property, TypesProperty, Ranks, \
+                    IssueOfficeProducts, AccountingCryptographicSecurity, OtherNetworkProperty, OtherInformationAboutComputers
 
 """Добавляем "классы редакторы" для отображения названий полей в админке"""
 
 
-class TypesPropertyAdmin(admin.ModelAdmin):
+class RanksAdmin(admin.ModelAdmin):
     """Вид имущества"""
+    list_display = ('r_title', 'r_note',)
+    list_display_links = ('r_title', 'r_note',)
+    search_fields = ('r_title', 'r_note',)
+
+
+class TypesPropertyAdmin(admin.ModelAdmin):
+    """Звания"""
     list_display = ('tp_type', 'tp_note',)
     list_display_links = ('tp_type', 'tp_note',)
     search_fields = ('tp_type', 'tp_note',)
@@ -65,21 +73,30 @@ class EmployeesStatusAdmin(admin.ModelAdmin):
 class EmployeesAdmin(admin.ModelAdmin):
     """Сотрудники"""
     list_display = ('emp_surname', 'emp_name', 'emp_middle_name', 'emp_birthday', 'fk_emp_status', 'fk_position',
-                    'fk_cabinet_location', 'emp_phone', 'emp_note',)
+                    'fk_rank', 'fk_cabinet_location', 'emp_phone', 'emp_note',)
     list_display_links = ('emp_surname', 'emp_name', 'emp_middle_name', 'emp_birthday', 'fk_emp_status', 'fk_position',
-                          'fk_cabinet_location', 'emp_note',)
+                          'fk_rank', 'fk_cabinet_location', 'emp_note',)
     search_fields = ('emp_surname', 'emp_name', 'emp_middle_name', 'emp_birthday',
                      'fk_cabinet_location__cab_num', 'emp_note',)
+
+
+class OtherInformationAboutComputersAdmin(admin.ModelAdmin):
+    """Иная информация о вычислительной технике"""
+    list_display = ('fk_prop', 'oiac_os', 'oiac_user_name', 'oiac_user_pass', 'oiac_comp_name', 'oiac_comp_workgroup',
+                    'oiac_note',)
+    list_display_links = ('fk_prop', 'oiac_os', 'oiac_user_name', 'oiac_user_pass', 'oiac_comp_name',
+                          'oiac_comp_workgroup','oiac_note',)
+    search_fields = ('oiac_os', 'oiac_user_name', 'oiac_user_pass', 'oiac_comp_name', 'oiac_comp_workgroup', 'oiac_note',)
 
 
 class ComputersIsodAdmin(admin.ModelAdmin):
     """Компьютеры для работы в сети ИСОД МВД"""
     list_display = ('comp_reg_num', 'comp_mac_address', 'comp_ip_address',
                     'comp_virt_ip_address', 'comp_id_dst_file', 'comp_title_dst_file','comp_attestation_status',
-                    'comp_note',)
+                    'fk_prop', 'comp_note',)
     list_display_links = ('comp_reg_num', 'comp_mac_address', 'comp_ip_address',
                           'comp_virt_ip_address', 'comp_id_dst_file', 'comp_title_dst_file','comp_attestation_status',
-                          'comp_note',)
+                          'fk_prop', 'comp_note',)
     search_fields = ('comp_reg_num', 'comp_mac_address', 'comp_ip_address',
                      'comp_virt_ip_address', 'comp_id_dst_file', 'comp_title_dst_file','comp_attestation_status',
                      'comp_note',)
@@ -103,19 +120,43 @@ class PropertyStandartsAdmin(admin.ModelAdmin):
 
 class PropertyAdmin(admin.ModelAdmin):
     """Имущество"""
-    list_display = ('prop_name', 'prop_ic_num', 'prop_inventory_num', 'prop_factory_num', 'prop_unit_measure',
+    list_display = ('fk_tp', 'prop_name', 'prop_ic_num', 'prop_inventory_num', 'prop_factory_num', 'prop_unit_measure',
                     'fk_ps', 'fk_prop_owner', 'fk_cabinet_location', 'prop_date_exploitation',
                     'prop_status', 'prop_note',)
-    list_display_links = ('prop_name', 'prop_ic_num', 'prop_inventory_num', 'prop_factory_num', 'prop_unit_measure',
+    list_display_links = ('fk_tp', 'prop_name', 'prop_ic_num', 'prop_inventory_num', 'prop_factory_num', 'prop_unit_measure',
                           'fk_ps', 'fk_prop_owner', 'fk_cabinet_location', 'prop_date_exploitation',
                           'prop_status', 'prop_note',)
-    search_fields = ('prop_name', 'prop_ic_num', 'prop_inventory_num', 'prop_factory_num', 'prop_unit_measure',
+    search_fields = ('fk_tp__tp_type', 'prop_name', 'prop_ic_num', 'prop_inventory_num', 'prop_factory_num', 'prop_unit_measure',
                      'prop_date_exploitation', 'prop_status', 'prop_note',)
 
+
+class IssueOfficeProductsAdmin(admin.ModelAdmin):
+    """Выдача канцелярских и иных расходных товаров"""
+    list_display = ('fk_tp', 'iop_title', 'iop_quantity', 'fk_op_owner', 'iop_date_issue', 'iop_note',)
+    list_display_links = ('fk_tp', 'iop_title', 'iop_quantity', 'fk_op_owner', 'iop_date_issue', 'iop_note',)
+    search_fields = ('iop_title', 'iop_quantity', 'iop_date_issue', 'iop_note',)
+
+
+class AccountingCryptographicSecurityAdmin(admin.ModelAdmin):
+    """Учет средств криптографической защиты информации (сокр. СКЗИ)"""
+    list_display = ('acs_title', 'acs_factory_num', 'acs_purpose', 'acs_received_organization', 'fk_acs_owner',
+                    'acs_start_date', 'acs_final_date', 'acs_status', 'acs_note')
+    list_display_links = ('acs_title', 'acs_factory_num', 'acs_purpose', 'acs_received_organization', 'fk_acs_owner',
+                    'acs_start_date', 'acs_final_date', 'acs_status', 'acs_note')
+    search_fields = ('acs_title', 'acs_factory_num', 'acs_purpose', 'acs_received_organization',
+                    'acs_start_date', 'acs_final_date', 'acs_status', 'acs_note')
+
+
+class OtherNetworkPropertyAdmin(admin.ModelAdmin):
+    """Иное имущество, подключенное к сети"""
+    list_display = ('fk_prop', 'onp_network_type', 'onp_ip_address', 'onp_note',)
+    list_display_links = ('fk_prop', 'onp_network_type', 'onp_ip_address', 'onp_note',)
+    search_fields = ('fk_prop', 'onp_network_type', 'onp_ip_address', 'onp_note',)
 
 
 admin.site.register(Cabinets, CabinetsAdmin)
 admin.site.register(TypesWork, TypesWorkAdmin)
+admin.site.register(Ranks, RanksAdmin)
 admin.site.register(Divisions, DivisionsAdmin)
 admin.site.register(DepartmentsFirst, DepartmentsFirstAdmin)
 admin.site.register(DepartmentsSecond, DepartmentsSecondAdmin)
@@ -127,3 +168,7 @@ admin.site.register(DiskStorageIsod, DiskStorageIsodAdmin)
 admin.site.register(PropertyStandarts, PropertyStandartsAdmin)
 admin.site.register(Property, PropertyAdmin)
 admin.site.register(TypesProperty, TypesPropertyAdmin)
+admin.site.register(IssueOfficeProducts, IssueOfficeProductsAdmin)
+admin.site.register(AccountingCryptographicSecurity, AccountingCryptographicSecurityAdmin)
+admin.site.register(OtherNetworkProperty, OtherNetworkPropertyAdmin)
+admin.site.register(OtherInformationAboutComputers, OtherInformationAboutComputersAdmin)
