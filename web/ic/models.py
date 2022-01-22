@@ -300,29 +300,25 @@ class AccountingCryptographicSecurity(models.Model):
                             )
 
     acs_id = models.AutoField(primary_key=True)
-    acs_title = models.CharField(blank=True, null=True, max_length=250, verbose_name='Наименование')
-    acs_factory_num = models.CharField(blank=True, null=True, max_length=100, verbose_name='Завод./серий. номер')
-    acs_purpose = models.CharField(blank=True, null=True, choices=ACS_CHOICES_PURPOSE, max_length=100, verbose_name='Предназначение')
-    acs_received_organization = models.CharField(blank=True, null=True, max_length=100,
-                                                 verbose_name='От кого получено',
+    fk_prop = models.ForeignKey(Property, db_column='fk_prop', on_delete=models.SET_NULL, blank=True, null=True,
+                                verbose_name='Имущество')
+    acs_purpose = models.CharField(blank=True, null=True, choices=ACS_CHOICES_PURPOSE, max_length=100,
+                                   verbose_name='Предназначение')
+    acs_received_organization = models.CharField(blank=True, null=True, max_length=100, verbose_name='От кого получено',
                                                  help_text='Например, ЦИТСиЗИ, ГИАЦ или ИЦ')
-    fk_acs_owner = models.ForeignKey(Employees, db_column='fk_acs_owner',
-                                      on_delete=models.SET_NULL, blank=True, null=True, verbose_name='Владелец')
     acs_start_date = models.DateField(blank=True, null=True, verbose_name='Начало срока действия')
     acs_final_date = models.DateField(blank=True, null=True, verbose_name='Окончание срока действия')
     acs_status = models.CharField(max_length=50, choices=ACS_CHOICES_STATUS, blank=True, null=True,
-                                  verbose_name='Статус', help_text='Выдан или Изъят')
+                                  verbose_name='Статус')
     acs_note = models.TextField(blank=True, null=True, verbose_name='Примечание')
 
-
     def __str__(self):
-        return self.acs_title
+        return self.acs_purpose
 
     class Meta:
         verbose_name_plural = 'СКЗИ'
         verbose_name = 'СКЗИ'
         db_table = 'accounting_cryptographic_security'
-        ordering = ['acs_title']
 
 
 class IssueOfficeProducts(models.Model):
@@ -336,6 +332,7 @@ class IssueOfficeProducts(models.Model):
                                       on_delete=models.SET_NULL, blank=True, null=True, verbose_name='Владелец')
     iop_date_issue = models.DateField(blank=True, null=True, verbose_name='Дата выдачи')
     iop_note = models.TextField(blank=True, null=True, verbose_name='Примечание')
+
     def __str__(self):
         return self.iop_title
 
