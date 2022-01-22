@@ -2,7 +2,8 @@ from django.contrib import admin
 
 from .models import Cabinets, TypesWork, Divisions, DepartmentsFirst, DepartmentsSecond, Positions, EmployeesStatus, \
                     Employees, ComputersIsod, DiskStorageIsod, PropertyStandarts, Property, TypesProperty, Ranks, \
-                    IssueOfficeProducts, AccountingCryptographicSecurity, OtherNetworkProperty, OtherInformationAboutComputers
+                    IssueOfficeProducts, AccountingCryptographicSecurity, OtherNetworkProperty, \
+                    OtherInformationAboutComputers
 
 """Добавляем "классы редакторы" для отображения названий полей в админке"""
 
@@ -139,12 +140,12 @@ class IssueOfficeProductsAdmin(admin.ModelAdmin):
 
 class AccountingCryptographicSecurityAdmin(admin.ModelAdmin):
     """Учет средств криптографической защиты информации (сокр. СКЗИ)"""
-    list_display = ('acs_title', 'acs_factory_num', 'acs_purpose', 'acs_received_organization', 'fk_acs_owner',
-                    'acs_start_date', 'acs_final_date', 'acs_status', 'acs_note')
-    list_display_links = ('acs_title', 'acs_factory_num', 'acs_purpose', 'acs_received_organization', 'fk_acs_owner',
-                    'acs_start_date', 'acs_final_date', 'acs_status', 'acs_note')
-    search_fields = ('acs_title', 'acs_factory_num', 'acs_purpose', 'acs_received_organization',
-                    'acs_start_date', 'acs_final_date', 'acs_status', 'acs_note')
+    list_display = ('fk_prop', 'acs_purpose', 'acs_received_organization', 'acs_start_date', 'acs_final_date',
+                    'acs_status', 'acs_note')
+    list_display_links = ('fk_prop', 'acs_purpose', 'acs_received_organization', 'acs_start_date', 'acs_final_date',
+                          'acs_status', 'acs_note')
+    search_fields = ('acs_purpose', 'acs_received_organization', 'acs_start_date', 'acs_final_date', 'acs_status',
+                     'acs_note')
 
 
 class OtherNetworkPropertyAdmin(admin.ModelAdmin):
