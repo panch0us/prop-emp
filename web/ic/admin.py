@@ -86,27 +86,28 @@ class OtherInformationAboutComputersAdmin(admin.ModelAdmin):
     list_display = ('fk_prop', 'oiac_os', 'oiac_user_name', 'oiac_user_pass', 'oiac_comp_name', 'oiac_comp_workgroup',
                     'oiac_note',)
     list_display_links = ('fk_prop', 'oiac_os', 'oiac_user_name', 'oiac_user_pass', 'oiac_comp_name',
-                          'oiac_comp_workgroup','oiac_note',)
-    search_fields = ('oiac_os', 'oiac_user_name', 'oiac_user_pass', 'oiac_comp_name', 'oiac_comp_workgroup', 'oiac_note',)
+                          'oiac_comp_workgroup', 'oiac_note',)
+    search_fields = ('oiac_os', 'oiac_user_name', 'oiac_user_pass', 'oiac_comp_name', 'oiac_comp_workgroup',
+                     'oiac_note',)
 
 
 class ComputersIsodAdmin(admin.ModelAdmin):
     """Компьютеры для работы в сети ИСОД МВД"""
     list_display = ('comp_reg_num', 'comp_mac_address', 'comp_ip_address',
-                    'comp_virt_ip_address', 'comp_id_dst_file', 'comp_title_dst_file','comp_attestation_status',
+                    'comp_virt_ip_address', 'comp_id_dst_file', 'comp_title_dst_file', 'comp_attestation_status',
                     'fk_prop', 'comp_note',)
     list_display_links = ('comp_reg_num', 'comp_mac_address', 'comp_ip_address',
-                          'comp_virt_ip_address', 'comp_id_dst_file', 'comp_title_dst_file','comp_attestation_status',
+                          'comp_virt_ip_address', 'comp_id_dst_file', 'comp_title_dst_file', 'comp_attestation_status',
                           'fk_prop', 'comp_note',)
     search_fields = ('comp_reg_num', 'comp_mac_address', 'comp_ip_address',
-                     'comp_virt_ip_address', 'comp_id_dst_file', 'comp_title_dst_file','comp_attestation_status',
+                     'comp_virt_ip_address', 'comp_id_dst_file', 'comp_title_dst_file', 'comp_attestation_status',
                      'comp_note',)
 
 
 class DiskStorageIsodAdmin(admin.ModelAdmin):
     """Дисковые хранилища для компьютеров, подключенных к сети ИСОД МВД"""
-    list_display = ('disk_reg_num', 'disk_model', 'disk_size', 'disk_factory_num', 'fk_disk_owner', 'fk_install_in_comp',
-                    'disk_note',)
+    list_display = ('disk_reg_num', 'disk_model', 'disk_size', 'disk_factory_num', 'fk_disk_owner',
+                    'fk_install_in_comp', 'disk_note',)
     list_display_links = ('disk_reg_num', 'disk_model', 'disk_size', 'disk_factory_num', 'fk_disk_owner',
                           'fk_install_in_comp', 'disk_note',)
     search_fields = ('disk_reg_num', 'disk_model', 'disk_factory_num', 'disk_note',)
@@ -124,11 +125,11 @@ class PropertyAdmin(admin.ModelAdmin):
     list_display = ('fk_tp', 'prop_name', 'prop_ic_num', 'prop_inventory_num', 'prop_factory_num', 'prop_unit_measure',
                     'fk_ps', 'fk_prop_owner', 'fk_cabinet_location', 'prop_date_exploitation',
                     'prop_status', 'prop_note',)
-    list_display_links = ('fk_tp', 'prop_name', 'prop_ic_num', 'prop_inventory_num', 'prop_factory_num', 'prop_unit_measure',
-                          'fk_ps', 'fk_prop_owner', 'fk_cabinet_location', 'prop_date_exploitation',
-                          'prop_status', 'prop_note',)
-    search_fields = ('fk_tp__tp_type', 'prop_name', 'prop_ic_num', 'prop_inventory_num', 'prop_factory_num', 'prop_unit_measure',
-                     'prop_date_exploitation', 'prop_status', 'prop_note',)
+    list_display_links = ('fk_tp', 'prop_name', 'prop_ic_num', 'prop_inventory_num', 'prop_factory_num',
+                          'prop_unit_measure', 'fk_ps', 'fk_prop_owner', 'fk_cabinet_location',
+                          'prop_date_exploitation', 'prop_status', 'prop_note',)
+    search_fields = ('fk_tp__tp_type', 'prop_name', 'prop_ic_num', 'prop_inventory_num', 'prop_factory_num',
+                     'prop_unit_measure', 'prop_date_exploitation', 'prop_status', 'prop_note',)
 
 
 class IssueOfficeProductsAdmin(admin.ModelAdmin):
