@@ -88,26 +88,26 @@ FROM public.divisions
 Выбор списка сотрудников c должностью и статусом
 *********************************************************************************************************/
 SELECT 
-	public.employees.emp_id 					AS 	"Номер",
-	public.employees.emp_surname 				AS 	"Фамилия", 
-	public.employees.emp_name 					AS 	"Имя", 	
-	public.employees.emp_middle_name 			AS 	"Отчество", 
-	public.employees.emp_birthday 				AS 	"Дата рождения",
-	public.positions.pos_title 					AS 	"Должность",
-	public.departments_second.dep_second_title 	AS 	"Отделение",
-	public.departments_first.dep_first_title 	AS 	"Отдел",
-	public.types_work.tw_title					AS 	"Вид службы",
-	public.employees_status.emp_status 			AS 	"Статус сотрудника"
+	public.employees.emp_id                     AS 	"Номер",
+	public.employees.emp_surname                AS 	"Фамилия",
+	public.employees.emp_name                   AS 	"Имя",
+	public.employees.emp_middle_name            AS 	"Отчество",
+	public.employees.emp_birthday               AS 	"Дата рождения",
+	public.positions.pos_title                  AS 	"Должность",
+	public.departments_second.dep_second_title  AS 	"Отделение",
+	public.departments_first.dep_first_title    AS 	"Отдел",
+	public.types_work.tw_title                  AS 	"Вид службы",
+	public.employees_status.emp_status          AS 	"Статус сотрудника"
 FROM
 	-- Выбираем таблицу с сотрудниками
 	public.employees 
 	-- Присоеденяем таблицу "positions" (должности)
-	LEFT OUTER JOIN public.positions 			ON public.employees.fk_position = public.positions.pos_id
+	LEFT OUTER JOIN public.positions            ON public.employees.fk_position = public.positions.pos_id
 	-- Присоеденяем таблицу "departments_second" (отделения)
-	LEFT OUTER JOIN public.departments_second 	ON public.positions.fk_dep_second = public.departments_second.dep_second_id
+	LEFT OUTER JOIN public.departments_second   ON public.positions.fk_dep_second = public.departments_second.dep_second_id
 	-- Присоеденяем таблицу "departments_first" (отделы)
-	LEFT OUTER JOIN public.departments_first 	ON public.positions.fk_dep_first = public.departments_first.dep_first_id
+	LEFT OUTER JOIN public.departments_first    ON public.positions.fk_dep_first = public.departments_first.dep_first_id
 	-- Присоеденяем таблицу "employees_status" (статусы сотрудников)
-	LEFT OUTER JOIN public.employees_status 	ON public.employees_status.emp_st_id = public.employees.fk_position
+	LEFT OUTER JOIN public.employees_status     ON public.employees_status.emp_st_id = public.employees.fk_position
 	-- Присоеденяем таблицу "types_work" (вид службы)
-	LEFT OUTER JOIN public.types_work 			ON public.positions.fk_types_work = public.types_work.tw_id
+	LEFT OUTER JOIN public.types_work           ON public.positions.fk_types_work = public.types_work.tw_id
