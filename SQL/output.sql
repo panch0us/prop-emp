@@ -37,14 +37,14 @@ SELECT
 	public.computers_isod.comp_factory_num															AS "Заводской номер АРМ",
 	array_to_string(array_agg(public.disk_storage_isod.disk_model	|| '/' || 	
 							  public.disk_storage_isod.disk_size), E';\n')							AS "Модель МНИ/ объем",
-	array_to_string(array_agg(public.disk_storage_isod.disk_factory_num), E';\n')															AS "Заводской номер МНИ",
+	array_to_string(array_agg(public.disk_storage_isod.disk_factory_num), E';\n')					AS "Заводской номер МНИ",
 	array_to_string(array_agg(public.disk_storage_isod.disk_reg_num), E';\n')						AS "Регистрационный номер МНИ",
 	public.computers_isod.comp_mac_address 															AS "МАС адрес сетевой карты",
 	public.computers_isod.comp_ip_address 															AS "IP-адрес",
 	public.computers_isod.comp_virt_ip_address 														AS "Виртуальный IP-адрес",
 	public.computers_isod.comp_id_dst_file 															AS "ID  DST", 
 	public.computers_isod.comp_title_dst_file 														AS "Имя DST", 
-	'г. Брянск, пр-т Ленина д. 18, кабинет № ' || public.cabinets.cab_num																			AS "Адрес дислокации АРМ", 
+	'г. Брянск, пр-т Ленина д. 18, кабинет № ' || public.cabinets.cab_num							AS "Адрес дислокации АРМ",
 	public.employees.emp_surname			|| ' ' ||
 		public.employees.emp_name			|| ' ' ||
 		public.employees.emp_middle_name 	|| ', '	||
