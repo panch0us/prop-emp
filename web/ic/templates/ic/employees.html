@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+{% load static %}
+<title>Главная страница</title>
+<head>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+  <header>ИЦ</header>
+  <div id="main">
+    <article>
+        <h3>Спосок сотрудников ИЦ</h3>
+        {% for emp in employees %}
+            <div>
+            {{ emp.emp_surname }} {{ emp.emp_name }} {{ emp.emp_middle_name }},
+                сл. тел: {{ emp.emp_phone }},
+                каб. {{ emp.fk_cabinet_location }}
+            </div>
+        {% endfor %}
+        <h3>Дни рождения в текущем месяце:</h3>
+        {% for emp_bm in employees %}
+            {% if emp_bm.emp_birthday.month == current_month %}
+            <div>
+                {{ emp_bm.emp_surname }} - {{ emp_bm.emp_birthday }}
+            </div>
+            {% endif %}
+        {% endfor %}
+    </article>
+    <nav>
+        навигация... <br>
+        навигация... <br>
+        навигация... <br>
+    </nav>
+    <aside>Дополнительно:</aside>
+  </div>
+  <footer>
+      <center>
+          <h5>Текущая дата и время на сервере: {% now "SHORT_DATETIME_FORMAT" %}</h5>
+      </center>
+  </footer>
+</body>
