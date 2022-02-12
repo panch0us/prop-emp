@@ -1,20 +1,46 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Главная страница</title>
-</head>
+<title>Главная страница</title>
+<style>
+* {
+  box-sizing: border-box;
+}
+body {
+  display: flex;
+  min-height: 100vh;
+  flex-direction: column;
+  margin: 0;
+}
+#main {
+  display: flex;
+  flex: 1;
+}
+#main > article {
+  background: #4d4d4d;
+  color: #cfcfcf;
+  flex: 1;
+}
+#main > nav,
+#main > aside {
+  flex: 0 0 20vw;
+  background: #424242;
+  color: #cfcfcf;
+}
+#main > nav {
+  order: -1;
+}
+header, footer {
+  background: #2e2e2e;
+  color: #cfcfcf;
+  height: 20vh;
+}
+header, footer, article, nav, aside {
+  padding: 1em;
+}
+</style>
 <body>
-    <header>
-        <br><br><br>
-        <hr>
-    </header>
-    <nav>
-        навигация... <br>
-        навигация... <br>
-        навигация... <br>
-    </nav>
-    <main>
+  <header>ИЦ УМВД России по Брянской области</header>
+  <div id="main">
+    <article>
         <h3>Дни рождения в текущем месяце:</h3>
     {% for emp_bm in employees %}
     {% if emp_bm.emp_birthday.month == current_month %}
@@ -23,11 +49,13 @@
     </div>
     {% endif %}
     {% endfor %}
-    </main>
-
+    </article>
+    <nav>
+        навигация... <br>
+        навигация... <br>
+        навигация... <br>
+    </nav>
+    <aside>Aside</aside>
+  </div>
+  <footer><center><h5>Текущая дата и время: {% now "SHORT_DATETIME_FORMAT" %}</h5></center></footer>
 </body>
-<footer>
-    <hr>
-    <center><h5>Текущая дата и время: {% now "SHORT_DATETIME_FORMAT" %}</h5></center>
-</footer>
-</html>
