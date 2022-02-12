@@ -78,7 +78,10 @@ class Property(models.Model):
     """Имущество ИЦ"""
     # выбор вариантов из указанного кортежа
     KINDS_UNITS_MEASURES = (('Комплект', 'Комплект'), ('Штука', 'Штука'))
-    KINDS_STATUS = (('Исправно', 'Исправно'), ('Неисправно', 'Неисправно'))
+    KINDS_STATUS = (('Исправно', 'Исправно'),
+                    ('Неисправно', 'Неисправно'),
+                    ('В процессе списания', 'В процессе списания'),
+                    ('Списано', 'Списано'))
 
     prop_id = models.AutoField(primary_key=True)
     fk_tp = models.ForeignKey(TypesProperty, db_column='fk_tp', on_delete=models.SET_NULL, blank=True, null=True,
@@ -95,8 +98,10 @@ class Property(models.Model):
                                       blank=True, null=True, verbose_name='Владелец имущества')
     fk_cabinet_location = models.ForeignKey(Cabinets, db_column='fk_cabinet_location', on_delete=models.SET_NULL,
                                             blank=True, null=True, verbose_name='Кабинет')
-    prop_date_exploitation = models.DateField(blank=True, null=True, verbose_name='Дата начала эксплуатации')
+    prop_date_delivery = models.DateField(blank=True, null=True, verbose_name='Дата поставки')
+    prop_date_exploitation = models.DateField(blank=True, null=True, verbose_name='Дата выдачи')
     prop_status = models.CharField(max_length=100, choices=KINDS_STATUS, verbose_name='Состояние имущества')
+    prop_date_deregistration = models.DateField(blank=True, null=True, verbose_name='Дата списания')
     prop_note = models.TextField(blank=True, verbose_name='Примечание')
 
     def __str__(self):
@@ -178,6 +183,25 @@ class DepartmentsSecond(models.Model):
         ordering = ['dep_second_title', 'fk_dep_first']
 
 
+class DepartmentsRegionalLevel(models.Model):
+    """Территориальный ОВД на районном уровне"""
+    drl_id = models.AutoField(primary_key=True)
+    drl_title = models.CharField(unique=True, max_length=250, verbose_name='Название ОВД')
+    drl_title_area = models.CharField(unique=True, max_length=100, verbose_name='Название района',)
+    fk_self_subordinate = models.ForeignKey('self', db_column='fk_self_subordinate', on_delete=models.SET_NULL,
+                                             blank=True, null=True, verbose_name='Входит в состав ОВД')
+    drl_note = models.TextField(blank=True, verbose_name='Примечание')
+
+    def __str__(self):
+        return f"{self.drl_title_area} ({self.drl_title})"
+
+    class Meta:
+        verbose_name_plural = 'Территориальные ОВД на районном уровне'
+        verbose_name = 'Территориальный ОВД на районном уровне'
+        db_table = 'departments_regional_level'
+        ordering = ['drl_title_area']
+
+
 class Positions(models.Model):
     """Должности"""
     pos_id = models.AutoField(primary_key=True)
@@ -228,6 +252,11 @@ class EmployeesStatus(models.Model):
 
 class Employees(models.Model):
     """Сотрудники"""
+    EMP_CHOICES_SPORT_CLASS = (('Мастер', 'Мастер'),
+                               ('Специалист 1 класса', 'Специалист 1 класса'),
+                               ('Специалист 2 класса', 'Специалист 2 класса'),
+                               ('Специалист 3 класса', 'Специалист 3 класса'))
+
     emp_id = models.AutoField(primary_key=True)
     emp_surname = models.CharField(max_length=50, verbose_name='Фамилия')
     emp_name = models.CharField(max_length=50, verbose_name='Имя')
@@ -238,10 +267,29 @@ class Employees(models.Model):
     fk_position = models.ForeignKey(Positions, db_column='fk_position', on_delete=models.SET_NULL, blank=True,
                                     null=True, verbose_name='Должность')
     fk_rank = models.ForeignKey(Ranks, db_column='fk_rank', on_delete=models.SET_NULL, blank=True, null=True,
-                                verbose_name='Звание')
+                                verbose_name='Звание, чин, категория')
     fk_cabinet_location = models.ForeignKey(Cabinets, db_column='fk_cabinet_location', on_delete=models.SET_NULL,
-                                            blank=True, null=True, verbose_name='Кабинет')
-    emp_phone = models.CharField(max_length=50, blank=True, verbose_name='Телефон')
+                                            blank=True, null=True, verbose_name='Каб.')
+    emp_phone = models.CharField(max_length=50, blank=True, verbose_name='Сл. тел', help_text='Формат: 11-11')
+    emp_phone_home = models.CharField(max_length=50, blank=True, verbose_name='Дом. тел.', help_text='Формат: 11-11-11')
+    emp_phone_mobile = models.CharField(max_length=100, blank=True, verbose_name='Моб. тел.',
+                                        help_text='Формат: 1-111-111-11-11')
+    emp_home_address = models.CharField(max_length=250, blank=True, verbose_name='Дом. адрес',
+                                        help_text='Формат: с указанием города (г. Брянск, ул. ...)')
+    emp_sport_class = models.CharField(blank=True, max_length=50, choices=EMP_CHOICES_SPORT_CLASS,
+                                        verbose_name='Квалификационное звание')
+    emp_date_sport_class = models.DateField(blank=True, null=True,
+                                            verbose_name='Дата присвоения квал. звания')
+    emp_date_document_sport_class = models.DateField(blank=True, null=True,
+                                            verbose_name='Дата приказа о присвоении квал. звания')
+    emp_number_sport_class = models.CharField(max_length=100, blank=True,
+                                              verbose_name='№ приказа о присвоении квал. звания',
+                                              help_text='Символ "№" не вносить')
+    fk_depart_region_lvl = models.ForeignKey(DepartmentsRegionalLevel, db_column='fk_depart_region_lvl',
+                                             on_delete=models.SET_NULL, blank=True, null=True,
+                                             verbose_name='Район проживания',
+                                             help_text='Район проживания (соотносится с адресом проживания)')
+
     emp_note = models.TextField(blank=True, verbose_name='Примечание')
 
     def __str__(self):
@@ -381,7 +429,7 @@ class ComputersIsod(models.Model):
 class DiskStorageIsod(models.Model):
     """Дисковые хранилища для компьютеров, подключенных к сети ИСОД МВД"""
     disk_id = models.AutoField(primary_key=True)
-    disk_reg_num = models.CharField(max_length=10, verbose_name='Регистрационный номер')
+    disk_reg_num = models.CharField(unique=True, max_length=10, verbose_name='Регистрационный номер')
     disk_model = models.CharField(max_length=100, verbose_name='Модель диска')
     disk_size = models.CharField(max_length=100, verbose_name='Объем диска',
                                  help_text='Например, 10 GB, 1 TB (между пробел)')
@@ -390,7 +438,7 @@ class DiskStorageIsod(models.Model):
                                       on_delete=models.SET_NULL, blank=True, null=True, verbose_name='Владелец')
     fk_install_in_comp = models.ForeignKey(ComputersIsod, db_column='fk_install_in_comp', on_delete=models.SET_NULL,
                                            blank=True, null=True, verbose_name='Установлен в компьютер',
-                                           help_text='Номер компьтера в таблице "Компьютеры в сети ИСОД"')
+                                           help_text='Номер компьютера в таблице "Компьютеры в сети ИСОД"')
     disk_note = models.TextField(blank=True, verbose_name='Примечание')
 
     def __str__(self):

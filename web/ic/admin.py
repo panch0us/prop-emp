@@ -3,7 +3,7 @@ from django.contrib import admin
 from .models import Cabinets, TypesWork, Divisions, DepartmentsFirst, DepartmentsSecond, Positions, EmployeesStatus, \
                     Employees, ComputersIsod, DiskStorageIsod, PropertyStandarts, Property, TypesProperty, Ranks, \
                     IssueOfficeProducts, AccountingCryptographicSecurity, OtherNetworkProperty, \
-                    OtherInformationAboutComputers
+                    OtherInformationAboutComputers, DepartmentsRegionalLevel
 
 """Добавляем "классы редакторы" для отображения названий полей в админке"""
 
@@ -74,9 +74,13 @@ class EmployeesStatusAdmin(admin.ModelAdmin):
 class EmployeesAdmin(admin.ModelAdmin):
     """Сотрудники"""
     list_display = ('emp_surname', 'emp_name', 'emp_middle_name', 'emp_birthday', 'fk_emp_status', 'fk_position',
-                    'fk_rank', 'fk_cabinet_location', 'emp_phone', 'emp_note',)
+                    'fk_rank', 'fk_cabinet_location', 'emp_phone', 'emp_phone_home', 'emp_phone_mobile',
+                    'emp_home_address', 'fk_depart_region_lvl', 'emp_sport_class', 'emp_date_sport_class',
+                    'emp_date_document_sport_class', 'emp_number_sport_class', 'emp_note',)
     list_display_links = ('emp_surname', 'emp_name', 'emp_middle_name', 'emp_birthday', 'fk_emp_status', 'fk_position',
-                          'fk_rank', 'fk_cabinet_location', 'emp_note',)
+                    'fk_rank', 'fk_cabinet_location', 'emp_phone', 'emp_phone_home', 'emp_phone_mobile',
+                    'emp_home_address', 'fk_depart_region_lvl', 'emp_sport_class', 'emp_date_sport_class',
+                    'emp_date_document_sport_class', 'emp_number_sport_class', 'emp_note',)
     search_fields = ('emp_surname', 'emp_name', 'emp_middle_name', 'emp_birthday',
                      'fk_cabinet_location__cab_num', 'emp_note',)
 
@@ -123,11 +127,11 @@ class PropertyStandartsAdmin(admin.ModelAdmin):
 class PropertyAdmin(admin.ModelAdmin):
     """Имущество"""
     list_display = ('fk_tp', 'prop_name', 'prop_ic_num', 'prop_inventory_num', 'prop_factory_num', 'prop_unit_measure',
-                    'fk_ps', 'fk_prop_owner', 'fk_cabinet_location', 'prop_date_exploitation',
-                    'prop_status', 'prop_note',)
-    list_display_links = ('fk_tp', 'prop_name', 'prop_ic_num', 'prop_inventory_num', 'prop_factory_num',
-                          'prop_unit_measure', 'fk_ps', 'fk_prop_owner', 'fk_cabinet_location',
-                          'prop_date_exploitation', 'prop_status', 'prop_note',)
+                    'fk_ps', 'fk_prop_owner', 'fk_cabinet_location', 'prop_date_delivery', 'prop_date_exploitation',
+                    'prop_status', 'prop_date_deregistration', 'prop_note',)
+    list_display_links = ('fk_tp', 'prop_name', 'prop_ic_num', 'prop_inventory_num', 'prop_factory_num', 'prop_unit_measure',
+                    'fk_ps', 'fk_prop_owner', 'fk_cabinet_location', 'prop_date_delivery', 'prop_date_exploitation',
+                    'prop_status', 'prop_date_deregistration', 'prop_note',)
     search_fields = ('fk_tp__tp_type', 'prop_name', 'prop_ic_num', 'prop_inventory_num', 'prop_factory_num',
                      'prop_unit_measure', 'prop_date_exploitation', 'prop_status', 'prop_note',)
 
@@ -156,6 +160,12 @@ class OtherNetworkPropertyAdmin(admin.ModelAdmin):
     search_fields = ('fk_prop', 'onp_network_type', 'onp_ip_address', 'onp_note',)
 
 
+class DepartmentsRegionalLevelAdmin(admin.ModelAdmin):
+    list_display = ('drl_title', 'drl_title_area', 'fk_self_subordinate', 'drl_note')
+    list_display_links = ('drl_title', 'drl_title_area', 'fk_self_subordinate', 'drl_note')
+    search_fields = ('drl_title', 'drl_title_area')
+
+
 admin.site.register(Cabinets, CabinetsAdmin)
 admin.site.register(TypesWork, TypesWorkAdmin)
 admin.site.register(Ranks, RanksAdmin)
@@ -174,3 +184,4 @@ admin.site.register(IssueOfficeProducts, IssueOfficeProductsAdmin)
 admin.site.register(AccountingCryptographicSecurity, AccountingCryptographicSecurityAdmin)
 admin.site.register(OtherNetworkProperty, OtherNetworkPropertyAdmin)
 admin.site.register(OtherInformationAboutComputers, OtherInformationAboutComputersAdmin)
+admin.site.register(DepartmentsRegionalLevel, DepartmentsRegionalLevelAdmin)
