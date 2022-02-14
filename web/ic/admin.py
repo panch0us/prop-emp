@@ -1,6 +1,4 @@
 from django.contrib import admin
-# Импортирую группы для разграничения прав просмотра в Админке (тест)
-from django.contrib.auth.models import User, Group
 
 from .models import Cabinets, TypesWork, Divisions, DepartmentsFirst, DepartmentsSecond, Positions, EmployeesStatus, \
                     Employees, ComputersIsod, DiskStorageIsod, PropertyStandarts, Property, TypesProperty, Ranks, \
