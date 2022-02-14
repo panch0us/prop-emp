@@ -1,4 +1,6 @@
 from django.db import models
+# импорт reverse для создания ссылки url
+from django.urls import reverse
 
 
 class TypesProperty(models.Model):
@@ -291,9 +293,17 @@ class Employees(models.Model):
                                              help_text='Район проживания (соотносится с адресом проживания)')
 
     emp_note = models.TextField(blank=True, verbose_name='Примечание')
+    emp_url = models.SlugField(max_length=130, help_text='Указать анг. буквами ссылку на сотрудника (например: ivanov)')
 
     def __str__(self):
         return f"{self.emp_surname} {self.emp_name} {self.emp_middle_name}"
+
+    def get_absolute_url(self):
+        """
+        Получение ссылки на сотрудника
+        employee_detail - имя шаблона в urls.py приложения ic
+        """
+        return reverse('employee_detail', kwargs={"slug": self.emp_url})
 
     class Meta:
         verbose_name_plural = 'Сотрудники'
