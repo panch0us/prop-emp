@@ -1,0 +1,35 @@
+* {
+  box-sizing: border-box;
+}
+body {
+  display: flex;
+  min-height: 100vh;
+  flex-direction: column;
+  margin: 0;
+}
+#main {
+  display: flex;
+  flex: 1;
+}
+#main > article {
+  background: #4d4d4d;
+  color: #cfcfcf;
+  flex: 1;
+}
+#main > nav,
+#main > aside {
+  flex: 0 0 20vw;
+  background: #424242;
+  color: #cfcfcf;
+}
+#main > nav {
+  order: -1;
+}
+header, footer {
+  background: #2e2e2e;
+  color: #cfcfcf;
+  height: 20vh;
+}
+header, footer, article, nav, aside {
+  padding: 1em;
+}

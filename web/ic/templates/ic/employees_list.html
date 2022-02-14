@@ -1,0 +1,23 @@
+{% extends 'ic/base.html' %}
+{% block title %} Спосок сотрудников ИЦ {% endblock title %}
+{% block content %}
+
+        <h3>Спосок сотрудников ИЦ</h3>
+        {% for emp in employees_list %}
+            <div>
+                <a href="{{ emp.get_absolute_url }}">
+                    {{ emp.emp_surname }} {{ emp.emp_name }} {{ emp.emp_middle_name }}</a>,
+                сл. тел: {{ emp.emp_phone }},
+                каб. {{ emp.fk_cabinet_location }}
+            </div>
+        {% endfor %}
+        <h3>Дни рождения в текущем месяце:</h3>
+        {% for emp_bm in employees_list %}
+            {% if emp_bm.emp_birthday.month == current_month %}
+            <div>
+                {{ emp_bm.emp_surname }} - {{ emp_bm.emp_birthday }}
+            </div>
+            {% endif %}
+        {% endfor %}
+
+{% endblock content %}

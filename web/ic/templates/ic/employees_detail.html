@@ -1,0 +1,9 @@
+{% extends 'ic/base.html' %}
+{% block title %} {{ employees.emp_surname }} {% endblock title %}
+{% block content %}
+    <h3>Подробно о сотруднике:</h3>
+    <div>
+        {{ employees.emp_surname }} {{ employees.emp_name }} {{ employees.emp_middle_name }} {{ employees.emp_birthday }},
+        статус: {{ employees.fk_emp_status }} <br> Звание: {{ employees.fk_rank }}
+    </div>
+{% endblock content %}
