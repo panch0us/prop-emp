@@ -1,4 +1,6 @@
 from django.contrib import admin
+# Импортирую группы для разграничения прав просмотра в Админке (тест)
+from django.contrib.auth.models import User, Group
 
 from .models import Cabinets, TypesWork, Divisions, DepartmentsFirst, DepartmentsSecond, Positions, EmployeesStatus, \
                     Employees, ComputersIsod, DiskStorageIsod, PropertyStandarts, Property, TypesProperty, Ranks, \
@@ -76,13 +78,36 @@ class EmployeesAdmin(admin.ModelAdmin):
     list_display = ('emp_surname', 'emp_name', 'emp_middle_name', 'emp_birthday', 'fk_emp_status', 'fk_position',
                     'fk_rank', 'fk_cabinet_location', 'emp_phone', 'emp_phone_home', 'emp_phone_mobile',
                     'emp_home_address', 'fk_depart_region_lvl', 'emp_sport_class', 'emp_date_sport_class',
-                    'emp_date_document_sport_class', 'emp_number_sport_class', 'emp_note',)
+                    'emp_date_document_sport_class', 'emp_number_sport_class', 'emp_note', 'emp_url')
     list_display_links = ('emp_surname', 'emp_name', 'emp_middle_name', 'emp_birthday', 'fk_emp_status', 'fk_position',
                     'fk_rank', 'fk_cabinet_location', 'emp_phone', 'emp_phone_home', 'emp_phone_mobile',
                     'emp_home_address', 'fk_depart_region_lvl', 'emp_sport_class', 'emp_date_sport_class',
                     'emp_date_document_sport_class', 'emp_number_sport_class', 'emp_note',)
     search_fields = ('emp_surname', 'emp_name', 'emp_middle_name', 'emp_birthday',
                      'fk_cabinet_location__cab_num', 'emp_note',)
+    list_filter = ('fk_position__fk_dep_first',)
+
+    def get_queryset(self, request):
+        qs = super(EmployeesAdmin, self).get_queryset(request)
+        # Если текущий пользователь суперюзер возвращаем всё:
+        if request.user.is_superuser:
+            return qs
+        # Если текущий пользователь принадлежит к группе "Вычислительный центр":
+        if request.user.groups.filter(name='Отдел оперативного учета и специальных фондов').exists():
+            return qs.filter(fk_position__fk_dep_first=1)
+        if request.user.groups.filter(name='Отдел разыскных и криминалистических учетов').exists():
+            return qs.filter(fk_position__fk_dep_first=2)
+        if request.user.groups.filter(name='Отдел пофамильного и дактилоскопического учета').exists():
+            return qs.filter(fk_position__fk_dep_first=3)
+        if request.user.groups.filter(name='Отдел статистической информации').exists():
+            return qs.filter(fk_position__fk_dep_first=4)
+        if request.user.groups.filter(name='Отдел предоставления государственных услуг').exists():
+            return qs.filter(fk_position__fk_dep_first=5)
+        if request.user.groups.filter(name='Вычислительный центр').exists():
+            return qs.filter(fk_position__fk_dep_first=6)
+        if request.user.groups.filter(name='Канцелярия').exists():
+            return qs.filter(fk_position__fk_dep_first=7)
+        return qs
 
 
 class OtherInformationAboutComputersAdmin(admin.ModelAdmin):
