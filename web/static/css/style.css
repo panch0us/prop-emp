@@ -33,3 +33,42 @@ header, footer {
 header, footer, article, nav, aside {
   padding: 1em;
 }
+/************************** Авторизация/Выход пользователя **************************/
+div.registration {
+    width: 200px;
+    height: 250px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin: -125px 0 0 -125px;
+}
+/********************************** Ссылки ************************************/
+a {
+  color: #cfcfcf;
+  text-decoration: none;
+}
+a:hover {
+  text-decoration: underline;
+}
+a:active {
+  color: black;
+}
+a:visited {
+  color: #cfcfcf;
+}
+
+
+table {
+    text-align: left;
+    background: #2e2e2e;
+    color: #cfcfcf;
+    margin: auto; /* расположение таблицы в центре */
+    width: 80%
+}
+th {
+    font-size: 16px;
+}
+td {
+    background: #4d4d4d;
+    padding: 5px;
+}
