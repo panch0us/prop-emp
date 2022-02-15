@@ -1,1 +1,6 @@
-<header><h2>ИЦ</h2></b></header>
+<header>
+    <b><h2>ИЦ</h2></b>
+    {% if user.is_authenticated %}
+    <b>Добрый день, {{ user.get_username }}</b>
+    {% endif %}
+</header>

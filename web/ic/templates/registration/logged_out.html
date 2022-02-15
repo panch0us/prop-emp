@@ -1,0 +1,8 @@
+{% extends 'ic/base.html' %}
+{% block title %} Вход на сайт {% endblock title %}
+{% block content %}
+    <div class="registration">
+        <h3>Вы вышли!</h3>
+        <a href="{% url 'login'%}">Надмите для входа на сайт!</a>
+    </div>
+{% endblock content %}

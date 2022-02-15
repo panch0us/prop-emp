@@ -1,3 +1,13 @@
 <aside>
-    Дополнительно:
+    <h3>Меню пользователя</h3>
+    <ul>
+        {% if user.is_authenticated %}
+        <li><a href="/ic/accounts/logout/">Выход</a></li>
+        {% else %}
+        <li><a href="/ic/accounts/login/">Авторизация</a></li>
+        {% endif %}
+        {% if user.is_staff %}
+            <li><a href="/admin/">Административная панель</a></li>
+        {% endif %}
+    </ul>
 </aside>

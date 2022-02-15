@@ -1,0 +1,17 @@
+{% extends 'ic/base.html' %}
+{% block title %} Вход на сайт {% endblock title %}
+{% block content %}
+    <div class="registration">
+        <h3>Вход на сайт:</h3>
+            {% if user.is_authenticated %}
+            <p>Вы уже выполнили вход!</p>
+            {% else %}
+            <form method="post">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <input type="hidden" name="next" value="{{ next }}">
+                <input type="submit" value="Войти">
+            </form>
+            {% endif %}
+    </div>
+{% endblock content %}
