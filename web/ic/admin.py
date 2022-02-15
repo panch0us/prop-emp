@@ -5,6 +5,9 @@ from .models import Cabinets, TypesWork, Divisions, DepartmentsFirst, Department
                     IssueOfficeProducts, AccountingCryptographicSecurity, OtherNetworkProperty, \
                     OtherInformationAboutComputers, DepartmentsRegionalLevel
 
+# Определяем главную страницу сайта (в Админке при нажатии "Открыть сайт" перенаправит на этот адрес)
+admin.site.site_url = '/ic'
+
 """Добавляем "классы редакторы" для отображения названий полей в админке"""
 
 
