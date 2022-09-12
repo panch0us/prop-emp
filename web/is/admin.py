@@ -16,9 +16,9 @@ class UsersInformationSystemsAdmin(admin.ModelAdmin):
     """Пользователи информационных систем"""
     list_display = ('fk_is_title', 'uis_surname', 'uis_name', 'uis_middle_name', 'fk_div', 'uis_position', 'uis_email',
     				'uis_login', 'uis_password', 'uis_phone', 'uis_note',)
-    list_display_links = ('fk_is_title', 'uis_surname', 'uis_name', 'uis_middle_name', 'fk_div', 'uis_position',
+    list_display_links = ('fk_is_title', 'uis_surname', 'uis_name', 'uis_middle_name', 'fk_div', 'uis_position', 
     					  'uis_email', 'uis_login', 'uis_password', 'uis_phone', 'uis_note',)
-    search_fields = ('fk_is_title__is_title', 'uis_surname', 'uis_name', 'uis_middle_name', 'fk_div__div_title',
+    search_fields = ('fk_is_title__is_title', 'uis_surname', 'uis_name', 'uis_middle_name', 'fk_div__div_title', 
 					 'uis_position', 'uis_email', 'uis_login', 'uis_password', 'uis_phone', 'uis_note',)
 
 
