@@ -208,6 +208,8 @@ class Positions(models.Model):
     """Должности"""
     pos_id = models.AutoField(primary_key=True)
     pos_title = models.CharField(max_length=100, verbose_name='Название должности')
+    pos_title_full = models.TextField(blank=True, verbose_name='Полное название должности', 
+                                      help_text='н-р: Начальник отделения администрирования баз данных и технологического обслуживания вычислительного центра')
     fk_dep_second = models.ForeignKey(DepartmentsSecond, db_column='fk_dep_second', on_delete=models.SET_NULL,
                                       blank=True, null=True, verbose_name='Отделение')
     fk_dep_first = models.ForeignKey(DepartmentsFirst, db_column='fk_dep_first', on_delete=models.SET_NULL,
@@ -259,13 +261,26 @@ class Employees(models.Model):
                                ('Специалист 2 класса', 'Специалист 2 класса'),
                                ('Специалист 3 класса', 'Специалист 3 класса'))
 
+    EMP_CHOICES_FAMILY_STATUS = (('Замужем / Женат', 'Замужем / Женат'),
+                                 ('Не замужем / Не женат', 'Не замужем / Не женат'))
+
+    EMPA_CHOICES_GENDER = (('М', 'М'),
+                            ('Ж', 'Ж'))
+
     emp_id = models.AutoField(primary_key=True)
     emp_surname = models.CharField(max_length=50, verbose_name='Фамилия')
     emp_name = models.CharField(max_length=50, verbose_name='Имя')
     emp_middle_name = models.CharField(max_length=50, verbose_name='Отчество')
     emp_birthday = models.DateField(blank=True, null=True, verbose_name='Дата рождения')
-    fk_emp_status = models.ForeignKey(EmployeesStatus, db_column='fk_emp_status', on_delete=models.SET_NULL, blank=True,
+    emp_gender = models.CharField(max_length=5, choices=EMPA_CHOICES_GENDER,verbose_name='Пол')
+    emp_family_status = models.CharField(blank=True, max_length=50, choices=EMP_CHOICES_FAMILY_STATUS,
+                                        verbose_name='Семейное положение')
+    fk_emp_status = models.ForeignKey(EmployeesStatus, db_column='fk_emp_status', on_delete=models.SET_NULL, 
                                       null=True, verbose_name='Статус сотрудника')
+    emp_date_start_work = models.PositiveIntegerField(blank=True, null=True, verbose_name='С какого года в ОВД')
+    emp_date_start_work_ic = models.DateField(blank=True, null=True, verbose_name='Дата поступления на службу в ИЦ', 
+                                                help_text='Если поступление вновь, то ставится последняя дата')
+    emp_date_start_position = models.DateField(blank=True, null=True, verbose_name='Дата назначения на текущую должность')
     fk_position = models.ForeignKey(Positions, db_column='fk_position', on_delete=models.SET_NULL, blank=True,
                                     null=True, verbose_name='Должность')
     fk_rank = models.ForeignKey(Ranks, db_column='fk_rank', on_delete=models.SET_NULL, blank=True, null=True,
@@ -276,24 +291,31 @@ class Employees(models.Model):
     emp_phone_home = models.CharField(max_length=50, blank=True, verbose_name='Дом. тел.', help_text='Формат: 11-11-11')
     emp_phone_mobile = models.CharField(max_length=100, blank=True, verbose_name='Моб. тел.',
                                         help_text='Формат: 1-111-111-11-11')
-    emp_home_address = models.CharField(max_length=250, blank=True, verbose_name='Дом. адрес',
+    emp_home_address = models.CharField(max_length=250, blank=True, verbose_name='Адрес проживания',
                                         help_text='Формат: с указанием города (г. Брянск, ул. ...)')
+    emp_home_address_reg = models.CharField(max_length=250, blank=True, verbose_name='Адрес регистрации',
+                                        help_text='Формат: с указанием города (г. Брянск, ул. ...)')
+    emp_date_driving_experience = models.PositiveIntegerField(blank=True, null=True, verbose_name='Стаж вождения', help_text='С какого года')
+    emp_driving_license_category = models.CharField(blank=True, null=True, max_length=15, verbose_name='Категория водительского удостоверения',
+                                            help_text='Например, B или A, B1')
     emp_sport_class = models.CharField(blank=True, max_length=50, choices=EMP_CHOICES_SPORT_CLASS,
                                         verbose_name='Квалификационное звание')
-    emp_date_sport_class = models.DateField(blank=True, null=True,
-                                            verbose_name='Дата присвоения квал. звания')
+    emp_date_sport_class = models.DateField(blank=True, null=True, verbose_name='Дата присвоения квал. звания')
     emp_date_document_sport_class = models.DateField(blank=True, null=True,
                                             verbose_name='Дата приказа о присвоении квал. звания')
     emp_number_sport_class = models.CharField(max_length=100, blank=True,
                                               verbose_name='№ приказа о присвоении квал. звания',
                                               help_text='Символ "№" не вносить')
+
+    emp_date_quali_upgrade = models.PositiveIntegerField(blank=True, null=True, verbose_name='Год последнего повышения квалификации')
     fk_depart_region_lvl = models.ForeignKey(DepartmentsRegionalLevel, db_column='fk_depart_region_lvl',
                                              on_delete=models.SET_NULL, blank=True, null=True,
                                              verbose_name='Район проживания',
                                              help_text='Район проживания (соотносится с адресом проживания)')
-
     emp_note = models.TextField(blank=True, verbose_name='Примечание')
-    emp_url = models.SlugField(max_length=130, help_text='Указать анг. буквами ссылку на сотрудника (например: ivanov)')
+    emp_url = models.SlugField(unique=True, max_length=130, 
+        help_text='Указать анг. буквами ссылку на сотрудника (например: ivanov)')
+    emp_date_end_work= models.DateField(blank=True, null=True, verbose_name='Дата увольнения (перевода)')
 
     def __str__(self):
         return f"{self.emp_surname} {self.emp_name} {self.emp_middle_name}"
@@ -310,6 +332,95 @@ class Employees(models.Model):
         verbose_name = 'Сотрудник'
         db_table = 'employees'
         ordering = ['emp_surname', 'emp_name', 'emp_middle_name', 'fk_position__fk_dep_first']
+
+
+class EmployeesChildren(models.Model):
+    """Сотрудники: дети"""
+    EMPA_CHOICES_AGE = (('До 7 лет', 'До 7 лет'),
+                                ('С 7 до 14 лет (включительно)', 'С 7 до 14 лет (включительно)'),
+                                ('С 15 до 18 лет', 'С 15 до 18 лет'))
+
+    EMPA_CHOICES_GENDER = (('М', 'М'),
+                            ('Ж', 'Ж'))
+
+    empc_id = models.AutoField(primary_key=True)
+    fk_emp = models.ForeignKey(Employees, db_column='fk_emp',
+                                      on_delete=models.CASCADE, blank=True, null=True, verbose_name='Родитель')
+    empc_surname = models.CharField(max_length=50, verbose_name='Фамилия ребенка')
+    empc_name = models.CharField(max_length=50, verbose_name='Имя ребенка')
+    empc_middle_name = models.CharField(max_length=50, verbose_name='Отчество ребенка')
+    empc_birthday = models.DateField(blank=True, null=True, verbose_name='Дата рождения ребенка')
+    empc_gender = models.CharField(blank=True, max_length=5, choices=EMPA_CHOICES_GENDER,
+                                        verbose_name='Пол ребенка')
+
+    class Meta:
+        verbose_name_plural = 'Сотрудники: дети'
+        verbose_name = 'Сотрудник: дети'
+        db_table = 'employees_children'
+        ordering = ['fk_emp__emp_surname']
+
+
+class EmployeesSpouse(models.Model):
+    """Сотрудники: супруги"""
+    emps_id = models.AutoField(primary_key=True)
+    fk_emp = models.ForeignKey(Employees, db_column='fk_emp',
+                                      on_delete=models.CASCADE, blank=True, null=True, verbose_name='Сотрудник')
+    emps_surname = models.CharField(max_length=50, verbose_name='Фамилия супруга(и)')
+    emps_name = models.CharField(max_length=50, verbose_name='Имя супруга(и)')
+    emps_middle_name = models.CharField(max_length=50, verbose_name='Отчество супруга(и)')
+    emps_birthday = models.DateField(blank=True, null=True, verbose_name='Дата рождения супруга(и)')
+
+
+    class Meta:
+        verbose_name_plural = 'Сотрудники: супруги'
+        verbose_name = 'Сотрудник: супруги'
+        db_table = 'employees_spouse'
+        ordering = ['fk_emp__emp_surname']
+
+
+class EmployeesAutomoto(models.Model):
+    """Сотрудники: личный автомототранспорт"""
+    EMPA_CHOICES_AUTOMOTO_OWNER = (('В собственности', 'В собственности'),
+                                   ('В пользовании', 'В пользовании'))
+
+    empa_id = models.AutoField(primary_key=True)
+    fk_auto_owner = models.ForeignKey(Employees, db_column='fk_auto_owner',
+                                      on_delete=models.CASCADE, blank=True, null=True, verbose_name='Владелец')
+    empa_model = models.CharField(max_length=250, verbose_name='Марка авто')
+    empa_reg_num = models.CharField(unique=True, max_length=50, verbose_name='Регистрационный знак')
+    empa_owner_type = models.CharField(max_length=100, choices=EMPA_CHOICES_AUTOMOTO_OWNER, verbose_name='Форма собственности')
+    empa_note = models.TextField(blank=True, verbose_name='Примечание')
+
+    class Meta:
+        verbose_name_plural = 'Сотрудники: личный автомототранспорт'
+        verbose_name = 'Сотрудник: личный автомототранспорт'
+        db_table = 'employees_automoto'
+        ordering = ['fk_auto_owner__emp_surname']
+
+
+class EmployeesWeapons(models.Model):
+    """Сотрудники: личное оружие"""
+    EMPA_CHOICES_TYPE_PERMIT = (('Хранение', 'Хранение'),
+                                ('Хранение и ношение', 'Хранение и ношение'))
+
+    empw_id = models.AutoField(primary_key=True)
+    fk_weapon_owner = models.ForeignKey(Employees, db_column='fk_auto_owner',
+                                      on_delete=models.CASCADE, blank=True, null=True, verbose_name='Владелец')
+    empw_model = models.CharField(max_length=250, verbose_name='Модель оружия')
+    empw_caliber = models.CharField(max_length=20, verbose_name='Калибр оружия', help_text='Например, 12х76')
+    empw_serial_number = models.CharField(max_length=250, verbose_name='Серия, номер')
+    empw_weapon_permit = models.CharField(max_length=250, verbose_name='Название разрешения на оружие', help_text='Например, РОХа')
+    empw_weapon_permit_serial_number = models.CharField(unique=True, max_length=250, verbose_name='Серийный номер разрешения')
+    empw_start_weapon_permit = models.DateField(verbose_name='Разрешение выдано с')
+    empw_end_weapon_permit = models.DateField(verbose_name='Разрешение действительно до')
+    empw_type_permit = models.CharField(max_length=100, choices=EMPA_CHOICES_TYPE_PERMIT, verbose_name='Тип разрешения')
+    empw_note = models.TextField(blank=True, verbose_name='Примечание')
+
+    class Meta:
+        verbose_name_plural = 'Сотрудники: личное оружие'
+        verbose_name = 'Сотрудник: личное оружие'
+        db_table = 'employees_weapons'
+        ordering = ['fk_weapon_owner__emp_surname']
 
 
 class OtherInformationAboutComputers(models.Model):

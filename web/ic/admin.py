@@ -3,7 +3,8 @@ from django.contrib import admin
 from .models import Cabinets, TypesWork, Divisions, DepartmentsFirst, DepartmentsSecond, Positions, EmployeesStatus, \
                     Employees, ComputersIsod, DiskStorageIsod, PropertyStandarts, Property, TypesProperty, Ranks, \
                     IssueOfficeProducts, AccountingCryptographicSecurity, OtherNetworkProperty, \
-                    OtherInformationAboutComputers, DepartmentsRegionalLevel
+                    OtherInformationAboutComputers, DepartmentsRegionalLevel, EmployeesAutomoto, EmployeesChildren, \
+                    EmployeesSpouse, EmployeesWeapons
 
 # Определяем главную страницу сайта (в Админке при нажатии "Открыть сайт" перенаправит на этот адрес)
 admin.site.site_url = '/ic'
@@ -192,6 +193,30 @@ class DepartmentsRegionalLevelAdmin(admin.ModelAdmin):
     search_fields = ('drl_title', 'drl_title_area')
 
 
+class EmployeesAutomotoAdmin(admin.ModelAdmin):
+    list_display = ('fk_auto_owner', 'empa_model', 'empa_reg_num',)
+    list_display_links = ('fk_auto_owner',)
+    search_fields = ('fk_auto_owner__emp_surname', 'empa_model',)
+
+
+class EmployeesChildrenAdmin(admin.ModelAdmin):
+    list_display = ('fk_emp', 'empc_surname', 'empc_name', 'empc_middle_name', 'empc_birthday',)
+    list_display_links = ('fk_emp',)
+    search_fields = ('fk_emp__emp_surname',)
+
+
+class EmployeesSpouseAdmin(admin.ModelAdmin):
+    list_display = ('fk_emp', 'emps_surname', 'emps_name', 'emps_middle_name', 'emps_birthday',)
+    list_display_links = ('fk_emp',)
+    search_fields = ('fk_emp__emp_surname',)
+
+
+class EmployeesWeaponsAdmin(admin.ModelAdmin):
+    list_display = ('fk_weapon_owner', 'empw_model', 'empw_caliber', 'empw_serial_number',)
+    list_display_links = ('fk_weapon_owner',)
+    search_fields = ('fk_weapon_owner__emp_surname',)
+
+
 admin.site.register(Cabinets, CabinetsAdmin)
 admin.site.register(TypesWork, TypesWorkAdmin)
 admin.site.register(Ranks, RanksAdmin)
@@ -211,3 +236,7 @@ admin.site.register(AccountingCryptographicSecurity, AccountingCryptographicSecu
 admin.site.register(OtherNetworkProperty, OtherNetworkPropertyAdmin)
 admin.site.register(OtherInformationAboutComputers, OtherInformationAboutComputersAdmin)
 admin.site.register(DepartmentsRegionalLevel, DepartmentsRegionalLevelAdmin)
+admin.site.register(EmployeesAutomoto, EmployeesAutomotoAdmin)
+admin.site.register(EmployeesChildren, EmployeesChildrenAdmin)
+admin.site.register(EmployeesSpouse, EmployeesSpouseAdmin)
+admin.site.register(EmployeesWeapons, EmployeesWeaponsAdmin)
