@@ -1,8 +1,19 @@
 {% extends 'ic/base.html' %}
-{% block title %} Список сотрудников ИЦ {% endblock title %}
+{% block title %} Списки для скачивания {% endblock title %}
 {% block content %}
-<!-- get_absolute_url
-        <h3>Спосок сотрудников ИЦ</h3>
+<table>
+        <tr>
+            <th colspan="5" align="center">Списки для скачивания</th>
+        </tr>
+        <tr>
+            <td><a href='/ic/download_lists/export/excel'>Список действующих сотрудников, ФГГС и работников ИЦ УМВД</a></td>
+        </tr>	
+        <tr>
+            <td><a href='/ic/download_lists/export/get_xlsx_arm_isod'>Список АРМ ИЦ сети ИСОД МВД для ЦИТСиЗИ</a></td>
+        </tr>
+</table>
+<!--get_absolute_url
+        <h3>Списки для скачивания</h3>
         {% for emp in employees_list %}
             <div>
                 <a href="{{ emp }}">
@@ -20,4 +31,5 @@
             {% endif %}
         {% endfor %}
 -->
+
 {% endblock content %}

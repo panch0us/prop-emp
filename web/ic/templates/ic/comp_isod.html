@@ -1,0 +1,53 @@
+{% extends 'ic/base.html' %}
+{% block title %} Компьютеры сети исод {% endblock title %}
+{% block content %}
+<table>
+    <tr>
+        <th colspan="5" align="center">Список компьютеров сети ИСОД МВД</th>
+    </tr>
+    <tr>
+        <td>арм №</td>
+        <td>MAC-адрес</td>
+        <td>ip-адрес</td>
+        <td>ФИО владельца</td>
+        <td>№ и имя dst</td>
+        <td>Статус</td>
+    </tr>
+    {% for comp in computers_isod %}
+    <tr>
+        <td>{{ comp.comp_reg_num }}</td>
+        <td>{{ comp.comp_mac_address}}</td>
+        <td>{{ comp.comp_ip_address}}</td>
+        <td>{{ comp.fk_prop.fk_prop_owner}}</td>
+        <td>{{ comp.comp_id_dst_file}} {{ comp.comp_title_dst_file}}</td>
+        <td>{{ comp.comp_attestation_status}}</td>
+    </tr>
+    {% endfor %}
+</table>
+<br>
+<table>
+    <tr>
+        <th colspan="7" align="center">Список иного имущества, подключенного к сети</th>
+    </tr>
+    <tr>
+        <td>№ иц</td>
+        <td>Вид имущества ИЦ</td>
+        <td>Название</td>
+        <td>ip-адрес</td>
+        <td>Тип сети</td>
+        <td>ФИО владельца</td>
+        <td>Примечание</td>
+    </tr>
+    {% for onp in other_net_prop %}
+    <tr>
+        <td>{{ onp.fk_prop.prop_ic_num }}</td>
+        <td>{{ onp.fk_prop.fk_tp }}</td>
+        <td>{{ onp.fk_prop.prop_name }}</td>
+        <td>{{ onp.onp_ip_address}}</td>
+        <td>{{ onp.onp_network_type }}</td>
+        <td>{{ onp.fk_prop.fk_prop_owner}}</td>
+        <td>{{ onp.onp_note}}</td>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock content %}

@@ -4,6 +4,76 @@
     <h3>Подробно о сотруднике:</h3>
     <div>
         {{ employees.emp_surname }} {{ employees.emp_name }} {{ employees.emp_middle_name }} {{ employees.emp_birthday }},
-        статус: {{ employees.fk_emp_status }} <br> Звание: {{ employees.fk_rank }}
+        статус: {{ employees.fk_emp_status }} 
+        <br> Звание: {{ employees.fk_rank }} 
+<br><hr>
+        <table>
+            <tr>
+                <th colspan="6" align="center">Имущество, закрепленное за сотрудником</th>
+            </tr>
+            <tr>
+                <td>№ ИЦ</td>
+                <td>Вид имущества внутренний</td>
+                <td>Наименование</td>
+                <td>Заводской/серийный №</td>
+                <td>Состояние</td>
+                <td>Примечание</td>
+            </tr>
+            {% for emp in emp_property %}
+            <tr>
+                <td>{{ emp.prop_ic_num}}</td>
+                <td>{{ emp.fk_tp}}</td>
+                <td>{{ emp.prop_name }}</td>
+                <td>{{ emp.prop_factory_num }}</td>
+                <td>{{ emp.prop_status }}</td>
+                <td>{{ emp.prop_note }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+<br>
+        <table>
+            <tr>
+                <th colspan="5" align="center">Дисковые хранилища ИСОД МВД, закрепленные за сотрудником</th>
+            </tr>
+            <tr>
+                <td>Рег. № в журнале</td>
+                <td>Установлен в АРМ ИСОД</td>
+                <td>Модель</td>
+                <td>Заводской номер диска</td>
+                <td>Примечание</td>
+            </tr>
+            {% for emp in emp_disk_storage_isod %}
+            <tr>
+                <td>{{ emp.disk_reg_num}}</td>
+                <td>{{ emp.fk_install_in_comp}}</td>
+                <td>{{ emp.disk_model }}</td>
+                <td>{{ emp.disk_factory_num }}</td>
+                <td>{{ emp.disk_note }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+
+<br>
+        <table>
+            <tr>
+                <th colspan="5" align="center">Компьютеры сети ИСОД, закрепленные за сотрудником</th>
+            </tr>
+            <tr>
+                <td>АРМ №</td>
+                <td>MAC-адрес</td>
+                <td>ip-адрес</td>
+                <td>Виртуальный ip</td>
+                <td>Примечание</td>
+            </tr>
+            {% for emp in emp_comp_isod %}
+            <tr>
+                <td>{{ emp.comp_reg_num}}</td>
+                <td>{{ emp.comp_mac_address}}</td>
+                <td>{{ emp.comp_ip_address }}</td>
+                <td>{{ emp.comp_virt_ip_address }}</td>
+                <td>{{ emp.comp_note }}</td>
+            </tr>
+            {% endfor %}
+        </table>
     </div>
 {% endblock content %}

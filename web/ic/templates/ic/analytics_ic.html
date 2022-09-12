@@ -1,0 +1,20 @@
+{% extends 'ic/base.html' %}
+{% block title %} Аналитическая справка по ИЦ {% endblock title %}
+{% block content %}
+
+        <h3>Сотрудники</h3>
+            <hr>
+        {% for emp in employees %}
+               {{ emp.emp_surname}} {{ emp.emp_name }} <br>
+        {% endfor %}
+<hr>
+            <h3>Должности</h3>
+        {% for pos in positions %}
+            {% for emp in employees %}
+                {% if pos|stringformat:"s" in emp.fk_position|stringformat:"s" %}
+                    {{ pos }} (должность занята) <br>
+                {% endif %}
+            {% endfor %}
+        {% endfor %}
+
+{% endblock content %}
