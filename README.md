@@ -1,4 +1,4 @@
-# property-accounting
+# prop-emp (property and employees)
 Обобщение сведений о работниках и имуществе в организации
 ____
 ## Возможности:
