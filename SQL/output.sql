@@ -42,9 +42,9 @@ SELECT
 	public.computers_isod.comp_virt_ip_address 														AS "Виртуальный IP-адрес",
 	public.computers_isod.comp_id_dst_file 															AS "ID  DST", 
 	public.computers_isod.comp_title_dst_file 														AS "Имя DST", 
-	'г. Брянск, пр-т Ленина д. 18, кабинет № ' || public.cabinets.cab_num				AS "Адрес дислокации АРМ",
+	'г. Брянск, пр-т Ленина д. 18, кабинет № ' 	|| public.cabinets.cab_num			AS "Адрес дислокации АРМ",
 	public.employees.emp_surname			|| ' ' ||
-		public.employees.emp_name			|| ' ' ||
+		public.employees.emp_name		|| ' ' ||
 		public.employees.emp_middle_name 	|| ', '	||
 		public.positions.pos_title																	AS "Ф.И.О., должность пользователя", 
 	public.computers_isod.comp_attestation_status 							AS "Состояние аттестации АРМ"
