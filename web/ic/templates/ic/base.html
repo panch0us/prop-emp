@@ -6,7 +6,7 @@
     <meta charset="UTF-8">
     <title> {% block title %} {% endblock title %}</title>
 </head>
-<body>
+<body class="theme-{{ request.session.site_theme|default:'dark' }}">
 {% include 'include/header.html' %}
 <div id="main">
     {% include 'include/nav.html' %}

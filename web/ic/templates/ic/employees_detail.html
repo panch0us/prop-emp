@@ -5,8 +5,28 @@
     <div>
         {{ employees.emp_surname }} {{ employees.emp_name }} {{ employees.emp_middle_name }} {{ employees.emp_birthday }},
         статус: {{ employees.fk_emp_status }} 
-        <br> Звание: {{ employees.fk_rank }} 
+	<br> Звание: {{ employees.fk_rank }} {{ time_keeping_doc }}
 <br><hr>
+        <table>
+            <tr>
+                <th colspan="5" align="center">Учет времени: переработка</th>
+            </tr>
+            <tr>
+		<td>Переработка</td>
+		<td>Отгулено</td>
+		<td>Оплачено</td>
+		<td>Приказ</td>
+            </tr>
+            {% for tk in time_keeping %}
+            <tr>
+                <td>{{ tk.tk_quantity_hours_all }}</td>
+                <td>{{ tk.tk_quantity_hours_received }}</td>
+                <td>{{ tk.tk_quantity_hours_paid }}</td>
+		<td><a href="/media/ic/timekeepingdoc/{{ tk.fk_doc_reg_num__tkd_file }}">{{ tk.fk_doc_reg_num }}</a></td>
+            </tr>
+            {% endfor %}
+        </table>
+<br>
         <table>
             <tr>
                 <th colspan="6" align="center">Имущество, закрепленное за сотрудником</th>
@@ -75,5 +95,6 @@
             </tr>
             {% endfor %}
         </table>
+<br>	
     </div>
 {% endblock content %}

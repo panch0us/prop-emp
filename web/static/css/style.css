@@ -1,37 +1,112 @@
 * {
   box-sizing: border-box;
 }
+:root {
+  --page-bg: #f3f7fa;
+  --panel-bg: #ffffff;
+  --panel-bg-muted: #eef6fb;
+  --surface-bg: #f7fbfd;
+  --layout-bg: #dfeaf1;
+  --header-bg: #17324d;
+  --text-color: #1c2730;
+  --muted-text: #667380;
+  --link-color: #174d73;
+  --table-bg: #ffffff;
+  --table-cell-bg: #f8fbfd;
+  --border-color: #d7e3ec;
+  --shadow-color: rgba(23, 50, 77, 0.08);
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --page-bg: #262626;
+    --panel-bg: #2e2e2e;
+    --panel-bg-muted: #383838;
+    --surface-bg: #333333;
+    --layout-bg: #424242;
+    --header-bg: #2e2e2e;
+    --text-color: #cfcfcf;
+    --muted-text: #a8a8a8;
+    --link-color: #d9edf7;
+    --table-bg: #2e2e2e;
+    --table-cell-bg: #4d4d4d;
+    --border-color: #555555;
+    --shadow-color: rgba(0, 0, 0, 0.25);
+  }
+}
+body.theme-light {
+  --page-bg: #f3f7fa;
+  --panel-bg: #ffffff;
+  --panel-bg-muted: #eef6fb;
+  --surface-bg: #f7fbfd;
+  --layout-bg: #dfeaf1;
+  --header-bg: #17324d;
+  --text-color: #1c2730;
+  --muted-text: #667380;
+  --link-color: #174d73;
+  --table-bg: #ffffff;
+  --table-cell-bg: #f8fbfd;
+  --border-color: #d7e3ec;
+  --shadow-color: rgba(23, 50, 77, 0.08);
+}
+body.theme-dark {
+  --page-bg: #262626;
+  --panel-bg: #2e2e2e;
+  --panel-bg-muted: #383838;
+  --surface-bg: #333333;
+  --layout-bg: #424242;
+  --header-bg: #2e2e2e;
+  --text-color: #cfcfcf;
+  --muted-text: #a8a8a8;
+  --link-color: #d9edf7;
+  --table-bg: #2e2e2e;
+  --table-cell-bg: #4d4d4d;
+  --border-color: #555555;
+  --shadow-color: rgba(0, 0, 0, 0.25);
+}
 body {
   display: flex;
   min-height: 100vh;
   flex-direction: column;
   margin: 0;
+  background: var(--page-bg);
+  color: var(--text-color);
 }
 #main {
   display: flex;
   flex: 1;
 }
 #main > article {
-  background: #4d4d4d;
-  color: #cfcfcf;
+  background: var(--surface-bg);
+  color: var(--text-color);
   flex: 1;
 }
 #main > nav,
 #main > aside {
   flex: 0 0 20vw;
-  background: #424242;
-  color: #cfcfcf;
+  background: var(--layout-bg);
+  color: var(--text-color);
 }
 #main > nav {
   order: -1;
 }
 header, footer {
-  background: #2e2e2e;
-  color: #cfcfcf;
+  background: var(--header-bg);
+  color: var(--text-color);
   height: 20vh;
 }
 header, footer, article, nav, aside {
   padding: 1em;
+}
+.theme-switch {
+  margin-top: 12px;
+}
+.theme-switch a {
+  display: inline-block;
+  padding: 7px 12px;
+  border: 1px solid var(--border-color);
+  border-radius: 999px;
+  background: var(--panel-bg);
+  color: var(--link-color);
 }
 /************************** Авторизация/Выход пользователя **************************/
 div.registration {
@@ -44,7 +119,7 @@ div.registration {
 }
 /********************************** Ссылки ************************************/
 a {
-  color: #cfcfcf;
+  color: var(--link-color);
   text-decoration: none;
 }
 a:hover {
@@ -54,14 +129,14 @@ a:active {
   color: black;
 }
 a:visited {
-  color: #cfcfcf;
+  color: var(--link-color);
 }
 
 
 table {
     text-align: left;
-    background: #2e2e2e;
-    color: #cfcfcf;
+    background: var(--table-bg);
+    color: var(--text-color);
     margin: auto; /* расположение таблицы в центре */
     width: 80%
 }
@@ -69,6 +144,53 @@ th {
     font-size: 16px;
 }
 td {
-    background: #4d4d4d;
+    background: var(--table-cell-bg);
     padding: 5px;
+}
+
+.dashboard-card {
+    margin: 18px 0;
+    padding: 18px 20px;
+    border: 1px solid var(--border-color);
+    border-radius: 14px;
+    background: linear-gradient(135deg, var(--surface-bg) 0%, var(--panel-bg-muted) 100%);
+}
+
+.dashboard-card h2 {
+    margin: 0 0 14px;
+    color: var(--text-color);
+    font-size: 22px;
+}
+
+.birthday-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 14px;
+}
+
+.birthday-box {
+    padding: 14px;
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    background: var(--panel-bg);
+    box-shadow: 0 8px 20px var(--shadow-color);
+}
+
+.birthday-box h3 {
+    margin: 0 0 10px;
+    color: var(--link-color);
+    font-size: 17px;
+}
+
+.birthday-box ul {
+    margin: 0;
+    padding-left: 20px;
+}
+
+.birthday-box li {
+    margin: 7px 0;
+}
+
+.muted {
+    color: var(--muted-text);
 }

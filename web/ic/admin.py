@@ -1,10 +1,13 @@
 from django.contrib import admin
+from django import forms
+from django.db import models as django_models
 
 from .models import Cabinets, TypesWork, Divisions, DepartmentsFirst, DepartmentsSecond, Positions, EmployeesStatus, \
                     Employees, ComputersIsod, DiskStorageIsod, PropertyStandarts, Property, TypesProperty, Ranks, \
                     IssueOfficeProducts, AccountingCryptographicSecurity, OtherNetworkProperty, \
                     OtherInformationAboutComputers, DepartmentsRegionalLevel, EmployeesAutomoto, EmployeesChildren, \
-                    EmployeesSpouse, EmployeesWeapons
+                    EmployeesSpouse, EmployeesWeapons, TimeKeepingDoc, TimeKeeping, PropertyAction, \
+                    InformationSystem, InformationSystemProperty
 
 # Определяем главную страницу сайта (в Админке при нажатии "Открыть сайт" перенаправит на этот адрес)
 admin.site.site_url = '/ic'
@@ -52,6 +55,7 @@ class DepartmentsFirstAdmin(admin.ModelAdmin):
     list_display = ('dep_first_title', 'fk_div')
     list_display_links = ('dep_first_title', 'fk_div')
     search_fields = ('dep_first_title',)
+    autocomplete_fields = ('fk_div',)
 
 
 class DepartmentsSecondAdmin(admin.ModelAdmin):
@@ -59,13 +63,15 @@ class DepartmentsSecondAdmin(admin.ModelAdmin):
     list_display = ('dep_second_title', 'fk_dep_first',)
     list_display_links = ('dep_second_title', 'fk_dep_first',)
     search_fields = ('dep_second_title',)
+    autocomplete_fields = ('fk_dep_first',)
 
 
 class PositionsAdmin(admin.ModelAdmin):
     """Должности"""
     list_display = ('pos_title', 'fk_dep_second', 'fk_dep_first', 'fk_division', 'pos_quantity', 'fk_types_work')
     list_display_links = ('pos_title', 'fk_dep_second', 'fk_dep_first', 'fk_division', 'pos_quantity', 'fk_types_work')
-    search_fields = ('pos_title', 'pos_quantity',)
+    search_fields = ('pos_title', 'pos_title_full', 'pos_quantity',)
+    autocomplete_fields = ('fk_dep_second', 'fk_dep_first', 'fk_division', 'fk_types_work')
 
 
 class EmployeesStatusAdmin(admin.ModelAdmin):
@@ -75,19 +81,64 @@ class EmployeesStatusAdmin(admin.ModelAdmin):
     search_fields = ('emp_status',)
 
 
+class EmployeesSpouseInline(admin.TabularInline):
+    model = EmployeesSpouse
+    extra = 1
+    fields = ('emps_surname', 'emps_name', 'emps_middle_name', 'emps_birthday')
+    verbose_name_plural = 'Супруги'
+
+
+class EmployeesChildrenInline(admin.TabularInline):
+    model = EmployeesChildren
+    extra = 1
+    fields = (
+        'empc_surname', 'empc_name', 'empc_middle_name', 'empc_birthday', 'empc_gender',
+        'empc_home_address', 'empc_study_place', 'empc_mobile_phone',
+    )
+    verbose_name_plural = 'Дети'
+
+
+class EmployeesAutomotoInline(admin.TabularInline):
+    model = EmployeesAutomoto
+    fk_name = 'fk_auto_owner'
+    extra = 1
+    fields = ('empa_model', 'empa_reg_num', 'empa_owner_type', 'empa_note')
+    verbose_name_plural = 'Личный автотранспорт'
+    formfield_overrides = {
+        django_models.TextField: {'widget': forms.Textarea(attrs={'rows': 2, 'cols': 70})},
+    }
+
+
+class EmployeesWeaponsInline(admin.TabularInline):
+    model = EmployeesWeapons
+    fk_name = 'fk_weapon_owner'
+    extra = 1
+    fields = (
+        'empw_model', 'empw_caliber', 'empw_serial_number', 'empw_weapon_permit',
+        'empw_weapon_permit_serial_number', 'empw_start_weapon_permit',
+        'empw_end_weapon_permit', 'empw_type_permit', 'empw_note',
+    )
+    verbose_name_plural = 'Личное оружие'
+    formfield_overrides = {
+        django_models.TextField: {'widget': forms.Textarea(attrs={'rows': 2, 'cols': 70})},
+    }
+
+
 class EmployeesAdmin(admin.ModelAdmin):
     """Сотрудники"""
-    list_display = ('emp_surname', 'emp_name', 'emp_middle_name', 'emp_birthday', 'fk_emp_status', 'fk_position',
-                    'fk_rank', 'fk_cabinet_location', 'emp_phone', 'emp_phone_home', 'emp_phone_mobile',
+    list_display = ('emp_surname', 'emp_name', 'emp_middle_name', 'fk_emp_status', 'fk_position',
+                    'emp_phone', 'emp_phone_home', 'emp_phone_mobile',
                     'emp_home_address', 'fk_depart_region_lvl', 'emp_sport_class', 'emp_date_sport_class',
                     'emp_date_document_sport_class', 'emp_number_sport_class', 'emp_note', 'emp_url')
-    list_display_links = ('emp_surname', 'emp_name', 'emp_middle_name', 'emp_birthday', 'fk_emp_status', 'fk_position',
-                    'fk_rank', 'fk_cabinet_location', 'emp_phone', 'emp_phone_home', 'emp_phone_mobile',
+    list_display_links = ('emp_surname', 'emp_name', 'emp_middle_name', 'fk_emp_status', 'fk_position',
+                    'emp_phone', 'emp_phone_home', 'emp_phone_mobile',
                     'emp_home_address', 'fk_depart_region_lvl', 'emp_sport_class', 'emp_date_sport_class',
                     'emp_date_document_sport_class', 'emp_number_sport_class', 'emp_note',)
-    search_fields = ('emp_surname', 'emp_name', 'emp_middle_name', 'emp_birthday',
-                     'fk_cabinet_location__cab_num', 'emp_note',)
+    search_fields = ('emp_surname', 'emp_name', 'emp_middle_name', 'emp_note',)
     list_filter = ('fk_position__fk_dep_first',)
+    autocomplete_fields = ('fk_emp_status', 'fk_position', 'fk_rank', 'fk_cabinet_location',
+                           'fk_depart_region_lvl')
+    inlines = (EmployeesSpouseInline, EmployeesChildrenInline, EmployeesAutomotoInline, EmployeesWeaponsInline)
 
     def get_queryset(self, request):
         qs = super(EmployeesAdmin, self).get_queryset(request)
@@ -120,10 +171,12 @@ class OtherInformationAboutComputersAdmin(admin.ModelAdmin):
                           'oiac_comp_workgroup', 'oiac_note',)
     search_fields = ('oiac_os', 'oiac_user_name', 'oiac_user_pass', 'oiac_comp_name', 'oiac_comp_workgroup',
                      'oiac_note',)
+    autocomplete_fields = ('fk_prop',)
 
 
 class ComputersIsodAdmin(admin.ModelAdmin):
     """Компьютеры для работы в сети ИСОД МВД"""
+    list_per_page = 9999 # Отключаем пагинацию
     list_display = ('comp_reg_num', 'comp_mac_address', 'comp_ip_address',
                     'comp_virt_ip_address', 'comp_id_dst_file', 'comp_title_dst_file', 'comp_attestation_status',
                     'fk_prop', 'comp_note',)
@@ -133,15 +186,18 @@ class ComputersIsodAdmin(admin.ModelAdmin):
     search_fields = ('comp_reg_num', 'comp_mac_address', 'comp_ip_address',
                      'comp_virt_ip_address', 'comp_id_dst_file', 'comp_title_dst_file', 'comp_attestation_status',
                      'comp_note',)
+    autocomplete_fields = ('fk_prop', 'fk_admin')
 
 
 class DiskStorageIsodAdmin(admin.ModelAdmin):
     """Дисковые хранилища для компьютеров, подключенных к сети ИСОД МВД"""
+    list_per_page = 9999 # Отключаем пагинацию
     list_display = ('disk_reg_num', 'disk_model', 'disk_size', 'disk_factory_num', 'fk_disk_owner',
                     'fk_install_in_comp', 'disk_note',)
     list_display_links = ('disk_reg_num', 'disk_model', 'disk_size', 'disk_factory_num', 'fk_disk_owner',
                           'fk_install_in_comp', 'disk_note',)
     search_fields = ('disk_reg_num', 'disk_model', 'disk_factory_num', 'disk_note',)
+    autocomplete_fields = ('fk_disk_owner', 'fk_install_in_comp')
 
 
 class PropertyStandartsAdmin(admin.ModelAdmin):
@@ -151,16 +207,99 @@ class PropertyStandartsAdmin(admin.ModelAdmin):
     search_fields = ('ps_name', 'ps_type', 'ps_quantity_limit', 'ps_note',)
 
 
+class PropertyActionInline(admin.TabularInline):
+    model = PropertyAction
+    extra = 1
+    fields = ('action_text', 'action_date')
+    formfield_overrides = {
+        django_models.TextField: {'widget': forms.Textarea(attrs={'rows': 2, 'cols': 70})},
+    }
+
+
+class PropertyInformationSystemInline(admin.TabularInline):
+    model = InformationSystemProperty
+    extra = 1
+    fields = ('fk_information_system', 'isp_description')
+    autocomplete_fields = ('fk_information_system',)
+    verbose_name_plural = 'Используется в информационных системах'
+    formfield_overrides = {
+        django_models.TextField: {'widget': forms.Textarea(attrs={'rows': 2, 'cols': 70})},
+    }
+
+
+class InformationSystemPropertyInline(admin.TabularInline):
+    model = InformationSystemProperty
+    extra = 1
+    fields = ('fk_property', 'isp_description')
+    autocomplete_fields = ('fk_property',)
+    formfield_overrides = {
+        django_models.TextField: {'widget': forms.Textarea(attrs={'rows': 2, 'cols': 70})},
+    }
+
+
 class PropertyAdmin(admin.ModelAdmin):
     """Имущество"""
+    fieldsets = (
+        (None, {
+            'fields': (
+                'fk_tp', 'fk_ps', 'prop_name', 'prop_ic_num',
+                'prop_inventory_num', 'prop_factory_num', 'prop_unit_measure', 'fk_prop_owner',
+                'fk_cabinet_location', 'prop_date_delivery', 'prop_date_exploitation',
+                'prop_warranty_until',
+            )
+        }),
+        ('Назначение и размещение', {
+            'fields': (
+                'prop_purpose', 'fk_installed_in',
+            )
+        }),
+        (None, {
+            'fields': (
+                'prop_status', 'prop_date_deregistration', 'prop_note',
+            )
+        }),
+    )
     list_display = ('fk_tp', 'prop_name', 'prop_ic_num', 'prop_inventory_num', 'prop_factory_num', 'prop_unit_measure',
-                    'fk_ps', 'fk_prop_owner', 'fk_cabinet_location', 'prop_date_delivery', 'prop_date_exploitation',
-                    'prop_status', 'prop_date_deregistration', 'prop_note',)
+                    'fk_ps', 'prop_purpose', 'fk_installed_in', 'fk_prop_owner', 'fk_cabinet_location', 'prop_date_delivery',
+                    'prop_date_exploitation', 'prop_warranty_until', 'prop_status', 'prop_date_deregistration', 'prop_note',)
     list_display_links = ('fk_tp', 'prop_name', 'prop_ic_num', 'prop_inventory_num', 'prop_factory_num', 'prop_unit_measure',
-                    'fk_ps', 'fk_prop_owner', 'fk_cabinet_location', 'prop_date_delivery', 'prop_date_exploitation',
-                    'prop_status', 'prop_date_deregistration', 'prop_note',)
+                    'fk_ps', 'prop_purpose', 'fk_installed_in', 'fk_prop_owner', 'fk_cabinet_location', 'prop_date_delivery',
+                    'prop_date_exploitation', 'prop_warranty_until', 'prop_status', 'prop_date_deregistration', 'prop_note',)
     search_fields = ('fk_tp__tp_type', 'prop_name', 'prop_ic_num', 'prop_inventory_num', 'prop_factory_num',
-                     'prop_unit_measure', 'prop_date_exploitation', 'prop_status', 'prop_note',)
+                     'prop_unit_measure', 'prop_date_exploitation', 'prop_status', 'prop_note',
+                     'fk_installed_in__prop_name', 'fk_installed_in__prop_ic_num',)
+    
+    autocomplete_fields = ('fk_tp', 'fk_ps', 'fk_prop_owner', 'fk_cabinet_location', 'fk_installed_in')
+    inlines = (PropertyActionInline, PropertyInformationSystemInline,)
+
+
+class InformationSystemAdmin(admin.ModelAdmin):
+    """Информационные системы"""
+    fieldsets = (
+        (None, {
+            'fields': (
+                'is_name', 'is_date_commissioning',
+                'is_security_level', 'is_security_class',
+                'is_threat_model', 'is_certificate',
+                'is_access_permit_system',
+                'is_technological_process_description',
+                'is_security_admin_instruction',
+                'is_user_instruction', 'is_password_protection_instruction',
+                'is_antivirus_instruction', 'is_confidential_information_list',
+                'is_room_access_instruction', 'is_access_rights_regulation',
+                'is_server_room_access_persons', 'is_date_decommissioning',
+            )
+        }),
+    )
+    list_display = ('is_name', 'is_date_commissioning', 'is_security_level',
+                    'is_security_class', 'is_date_decommissioning',)
+    list_display_links = ('is_name', 'is_date_commissioning', 'is_security_level',
+                          'is_security_class', 'is_date_decommissioning',)
+    search_fields = ('is_name', 'is_date_commissioning', 'is_security_level', 'is_security_class')
+    inlines = (InformationSystemPropertyInline,)
+    formfield_overrides = {
+        django_models.TextField: {'widget': forms.Textarea(attrs={'rows': 2, 'cols': 90})},
+    }
 
 
 class IssueOfficeProductsAdmin(admin.ModelAdmin):
@@ -168,6 +307,7 @@ class IssueOfficeProductsAdmin(admin.ModelAdmin):
     list_display = ('fk_tp', 'iop_title', 'iop_quantity', 'fk_op_owner', 'iop_date_issue', 'iop_note',)
     list_display_links = ('fk_tp', 'iop_title', 'iop_quantity', 'fk_op_owner', 'iop_date_issue', 'iop_note',)
     search_fields = ('iop_title', 'iop_quantity', 'iop_date_issue', 'iop_note',)
+    autocomplete_fields = ('fk_tp', 'fk_op_owner')
 
 
 class AccountingCryptographicSecurityAdmin(admin.ModelAdmin):
@@ -178,43 +318,66 @@ class AccountingCryptographicSecurityAdmin(admin.ModelAdmin):
                           'acs_status', 'acs_note')
     search_fields = ('acs_purpose', 'acs_received_organization', 'acs_start_date', 'acs_final_date', 'acs_status',
                      'acs_note')
+    autocomplete_fields = ('fk_prop',)
 
 
 class OtherNetworkPropertyAdmin(admin.ModelAdmin):
     """Иное имущество, подключенное к сети"""
-    list_display = ('fk_prop', 'onp_network_type', 'onp_ip_address', 'onp_note',)
-    list_display_links = ('fk_prop', 'onp_network_type', 'onp_ip_address', 'onp_note',)
-    search_fields = ('fk_prop', 'onp_network_type', 'onp_ip_address', 'onp_note',)
+    list_display = ('fk_prop', 'onp_network_type', 'onp_ip_address', 'onp_virt_ip_address', 'onp_note',)
+    list_display_links = ('fk_prop', 'onp_network_type', 'onp_ip_address', 'onp_virt_ip_address', 'onp_note',)
+    search_fields = ('fk_prop__prop_name', 'fk_prop__prop_ic_num', 'onp_network_type', 'onp_ip_address',
+                     'onp_virt_ip_address', 'onp_note',)
+    autocomplete_fields = ('fk_prop',)
 
 
 class DepartmentsRegionalLevelAdmin(admin.ModelAdmin):
     list_display = ('drl_title', 'drl_title_area', 'fk_self_subordinate', 'drl_note')
     list_display_links = ('drl_title', 'drl_title_area', 'fk_self_subordinate', 'drl_note')
     search_fields = ('drl_title', 'drl_title_area')
+    autocomplete_fields = ('fk_self_subordinate',)
 
 
 class EmployeesAutomotoAdmin(admin.ModelAdmin):
     list_display = ('fk_auto_owner', 'empa_model', 'empa_reg_num',)
     list_display_links = ('fk_auto_owner',)
     search_fields = ('fk_auto_owner__emp_surname', 'empa_model',)
+    autocomplete_fields = ('fk_auto_owner',)
 
 
 class EmployeesChildrenAdmin(admin.ModelAdmin):
-    list_display = ('fk_emp', 'empc_surname', 'empc_name', 'empc_middle_name', 'empc_birthday',)
+    list_display = ('fk_emp', 'empc_surname', 'empc_name', 'empc_middle_name', 'empc_birthday',
+                    'empc_gender', 'empc_home_address', 'empc_study_place', 'empc_mobile_phone',)
     list_display_links = ('fk_emp',)
-    search_fields = ('fk_emp__emp_surname',)
+    search_fields = ('fk_emp__emp_surname', 'fk_emp__emp_name', 'fk_emp__emp_middle_name',
+                     'empc_surname', 'empc_name', 'empc_middle_name', 'empc_home_address',
+                     'empc_study_place', 'empc_mobile_phone',)
+    autocomplete_fields = ('fk_emp',)
 
 
 class EmployeesSpouseAdmin(admin.ModelAdmin):
     list_display = ('fk_emp', 'emps_surname', 'emps_name', 'emps_middle_name', 'emps_birthday',)
     list_display_links = ('fk_emp',)
     search_fields = ('fk_emp__emp_surname',)
+    autocomplete_fields = ('fk_emp',)
 
 
 class EmployeesWeaponsAdmin(admin.ModelAdmin):
     list_display = ('fk_weapon_owner', 'empw_model', 'empw_caliber', 'empw_serial_number',)
     list_display_links = ('fk_weapon_owner',)
     search_fields = ('fk_weapon_owner__emp_surname',)
+    autocomplete_fields = ('fk_weapon_owner',)
+
+
+class TimeKeepingDocAdmin(admin.ModelAdmin):
+    list_display = ('tkd_doc_reg_num', 'tkd_date', 'tkd_doc_name', 'tkd_file',)
+    list_display_links = ('tkd_doc_reg_num',)
+    search_fields = ('tkd_doc_reg_num', 'tkd_date', 'tkd_doc_name',)
+
+class TimeKeepingAdmin(admin.ModelAdmin):
+    list_display = ('fk_emp_name', 'fk_doc_reg_num', 'tk_quantity_hours_all',) 
+    list_display_links = ('fk_emp_name',)
+    search_fields = ('fk_emp_name__emp_surname',)
+    autocomplete_fields = ('fk_emp_name', 'fk_doc_reg_num')
 
 
 admin.site.register(Cabinets, CabinetsAdmin)
@@ -230,6 +393,7 @@ admin.site.register(ComputersIsod, ComputersIsodAdmin)
 admin.site.register(DiskStorageIsod, DiskStorageIsodAdmin)
 admin.site.register(PropertyStandarts, PropertyStandartsAdmin)
 admin.site.register(Property, PropertyAdmin)
+admin.site.register(InformationSystem, InformationSystemAdmin)
 admin.site.register(TypesProperty, TypesPropertyAdmin)
 admin.site.register(IssueOfficeProducts, IssueOfficeProductsAdmin)
 admin.site.register(AccountingCryptographicSecurity, AccountingCryptographicSecurityAdmin)
@@ -240,3 +404,6 @@ admin.site.register(EmployeesAutomoto, EmployeesAutomotoAdmin)
 admin.site.register(EmployeesChildren, EmployeesChildrenAdmin)
 admin.site.register(EmployeesSpouse, EmployeesSpouseAdmin)
 admin.site.register(EmployeesWeapons, EmployeesWeaponsAdmin)
+admin.site.register(TimeKeepingDoc, TimeKeepingDocAdmin)
+admin.site.register(TimeKeeping, TimeKeepingAdmin)
+

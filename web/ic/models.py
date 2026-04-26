@@ -1,11 +1,17 @@
 from django.db import models
+from django.core.exceptions import ValidationError
 # импорт reverse для создания ссылки url
 from django.urls import reverse
+# Работа с файлами:
+from django.core.files.storage import FileSystemStorage
+
+# Свой путь к сохранению файлов для модели: TimeKeppingDoc
+TKD_FILE_PATH = FileSystemStorage(location='/home/web/www/ic/web/media/ic/timekeepingdoc')
 
 
 class TypesProperty(models.Model):
     """Вид имущества"""
-    tp_id = models.AutoField(primary_key=True)
+    tp_id   = models.AutoField(primary_key=True)
     tp_type = models.CharField(unique=True, max_length=100, verbose_name='Вид имущества')
     tp_note = models.TextField(blank=True, verbose_name='Примечание')
 
@@ -14,41 +20,41 @@ class TypesProperty(models.Model):
 
     class Meta:
         verbose_name_plural = 'Виды имущества'
-        verbose_name = 'Вид имущества'
-        db_table = 'types_property'
-        ordering = ['tp_type']
+        verbose_name        = 'Вид имущества'
+        db_table            = 'types_property'
+        ordering            = ['tp_type']
 
 
 class Ranks(models.Model):
     """Звания"""
-    r_id = models.AutoField(primary_key=True)
+    r_id    = models.AutoField(primary_key=True)
     r_title = models.CharField(unique=True, max_length=250, verbose_name='Звание')
-    r_note = models.TextField(blank=True, verbose_name='Примечание')
+    r_note  = models.TextField(blank=True, verbose_name='Примечание')
 
     def __str__(self):
         return f"{self.r_title}"
 
     class Meta:
         verbose_name_plural = 'Звания'
-        verbose_name = 'Звание'
-        db_table = 'ranks'
-        ordering = ['r_title']
+        verbose_name        = 'Звание'
+        db_table            = 'ranks'
+        ordering            = ['r_title']
 
 
 class Cabinets(models.Model):
     """Кабинеты"""
-    cab_id = models.AutoField(primary_key=True)
-    cab_num = models.CharField(unique=True, max_length=30, verbose_name='Номер/Название кабинета')
-    cab_note = models.TextField(blank=True, verbose_name='Примечание')
+    cab_id      = models.AutoField(primary_key=True)
+    cab_num     = models.CharField(unique=True, max_length=30, verbose_name='Номер/Название кабинета')
+    cab_note    = models.TextField(blank=True, verbose_name='Примечание')
 
     def __str__(self):
         return f"{self.cab_num}"
 
     class Meta:
         verbose_name_plural = 'Кабинеты'
-        verbose_name = 'Кабинет'
-        db_table = 'cabinets'
-        ordering = ['cab_num']
+        verbose_name        = 'Кабинет'
+        db_table            = 'cabinets'
+        ordering            = ['cab_num']
 
 
 class PropertyStandarts(models.Model):
@@ -59,52 +65,71 @@ class PropertyStandarts(models.Model):
                              'Средства электронной организационной техники'),
                             ('Специальная техника', 'Специальная техника'))
 
-    ps_id = models.AutoField(primary_key=True)
-    ps_name = models.CharField(unique=True, max_length=250, verbose_name='Наименование имущества')
-    ps_type = models.CharField(blank=True, max_length=50, choices=KINDS_TYPES_PROPERTY,
-                               verbose_name='Тип имущества')
-    ps_quantity_limit = models.IntegerField(blank=True, null=True, verbose_name='Количество положенного имущества')
-    ps_note = models.TextField(blank=True, verbose_name='Примечание')
+    ps_id               = models.AutoField(primary_key=True)
+    ps_name             = models.CharField(unique=True, max_length=250, verbose_name='Наименование имущества')
+    ps_type             = models.CharField(blank=True, max_length=100, choices=KINDS_TYPES_PROPERTY, verbose_name='Тип имущества')
+    ps_quantity_limit   = models.IntegerField(blank=True, null=True, verbose_name='Количество положенного имущества')
+    ps_note             = models.TextField(blank=True, verbose_name='Примечание')
 
     def __str__(self):
         return f"{self.ps_name}"
 
     class Meta:
         verbose_name_plural = 'Нормы положенности'
-        verbose_name = 'Норма положенности'
-        db_table = 'property_standarts'
-        ordering = ['ps_name', 'ps_type']
+        verbose_name        = 'Норма положенности'
+        db_table            = 'property_standarts'
+        ordering            = ['ps_name', 'ps_type']
 
 
 class Property(models.Model):
     """Имущество ИЦ"""
     # выбор вариантов из указанного кортежа
-    KINDS_UNITS_MEASURES = (('Комплект', 'Комплект'), ('Штука', 'Штука'))
-    KINDS_STATUS = (('Исправно', 'Исправно'),
-                    ('Неисправно', 'Неисправно'),
-                    ('В процессе списания', 'В процессе списания'),
-                    ('Списано', 'Списано'))
+    KINDS_UNITS_MEASURES     = (('Комплект', 'Комплект'), ('Штука', 'Штука'))
+    KINDS_PURPOSE            = (('Основное', 'Основное'), ('Резервное', 'Резервное'))
+    KINDS_STATUS             = (('Исправно', 'Исправно'),
+                                ('Неисправно', 'Неисправно'),
+                                ('В процессе списания', 'В процессе списания'),
+                                ('Списано', 'Списано'))
 
-    prop_id = models.AutoField(primary_key=True)
-    fk_tp = models.ForeignKey(TypesProperty, db_column='fk_tp', on_delete=models.SET_NULL, blank=True, null=True,
-                              verbose_name='Вид имущества внутренний')
-    fk_ps = models.ForeignKey(PropertyStandarts, db_column='fk_ps', on_delete=models.SET_NULL, blank=True, null=True,
-                              verbose_name='Вид имущества по нормам положенности')
-    prop_name = models.CharField(blank=True, max_length=250, verbose_name='Наименование имущества')
-    prop_ic_num = models.CharField(blank=True, max_length=50, verbose_name='Номер учета ИЦ')
-    prop_inventory_num = models.CharField(blank=True, max_length=250, verbose_name='Номер учета УМВД (инв. номер)')
-    prop_factory_num = models.CharField(blank=True, max_length=250, verbose_name='Заводской/серийный номер')
-    prop_unit_measure = models.CharField(max_length=50, choices=KINDS_UNITS_MEASURES, blank=True,
-                                         verbose_name='Единица измерения')
-    fk_prop_owner = models.ForeignKey('Employees', db_column='fk_prop_owner', on_delete=models.SET_NULL,
-                                      blank=True, null=True, verbose_name='Владелец имущества')
-    fk_cabinet_location = models.ForeignKey(Cabinets, db_column='fk_cabinet_location', on_delete=models.SET_NULL,
-                                            blank=True, null=True, verbose_name='Кабинет')
-    prop_date_delivery = models.DateField(blank=True, null=True, verbose_name='Дата поставки')
-    prop_date_exploitation = models.DateField(blank=True, null=True, verbose_name='Дата выдачи')
-    prop_status = models.CharField(max_length=100, choices=KINDS_STATUS, verbose_name='Состояние имущества')
+    prop_id                  = models.AutoField(primary_key=True)
+    fk_tp                    = models.ForeignKey(TypesProperty, db_column='fk_tp', on_delete=models.SET_NULL, blank=True, null=True, verbose_name='Вид имущества внутренний')
+    fk_ps                    = models.ForeignKey(PropertyStandarts, db_column='fk_ps', on_delete=models.SET_NULL, blank=True, null=True, verbose_name='Вид имущества по нормам положенности')
+    prop_name                = models.CharField(blank=True, max_length=250, verbose_name='Наименование имущества')
+    prop_ic_num              = models.CharField(unique=True, max_length=50, verbose_name='Номер учета ИЦ')
+    prop_inventory_num       = models.CharField(blank=True, max_length=250, verbose_name='Номер учета УМВД (инв. номер)')
+    prop_factory_num         = models.CharField(blank=True, max_length=250, verbose_name='Заводской/серийный номер')
+    prop_unit_measure        = models.CharField(max_length=50, choices=KINDS_UNITS_MEASURES, blank=True, verbose_name='Единица измерения')
+    fk_prop_owner            = models.ForeignKey('Employees', db_column='fk_prop_owner', on_delete=models.SET_NULL, blank=True, null=True, verbose_name='Владелец имущества')
+    fk_cabinet_location      = models.ForeignKey(Cabinets, db_column='fk_cabinet_location', on_delete=models.SET_NULL, blank=True, null=True, verbose_name='Кабинет')
+    prop_date_delivery       = models.DateField(blank=True, null=True, verbose_name='Дата поставки')
+    prop_date_exploitation   = models.DateField(blank=True, null=True, verbose_name='Дата выдачи')
+    prop_purpose             = models.CharField(max_length=20, choices=KINDS_PURPOSE, default='Основное', verbose_name='Назначение')
+    fk_installed_in          = models.ForeignKey('self', db_column='fk_installed_in', on_delete=models.SET_NULL, blank=True, null=True, related_name='installed_parts', verbose_name='Установлено в / Предназначено для',
+                                                 help_text='Пример: стойка - основное имущество и никуда не установлена; сервер - основное имущество, установленное в стойку; HDD - резервное имущество, предназначенное для сервера.')
+    prop_warranty_until      = models.DateField(blank=True, null=True, verbose_name='Гарантия')
+    prop_status              = models.CharField(max_length=100, choices=KINDS_STATUS, verbose_name='Состояние имущества')
     prop_date_deregistration = models.DateField(blank=True, null=True, verbose_name='Дата списания')
-    prop_note = models.TextField(blank=True, verbose_name='Примечание')
+    prop_note                = models.TextField(blank=True, verbose_name='Примечание')
+
+    def clean(self):
+        super().clean()
+
+        if self.fk_installed_in_id is None:
+            return
+
+        if self.pk and self.fk_installed_in_id == self.pk:
+            raise ValidationError({'fk_installed_in': 'Нельзя устанавливать имущество само в себя.'})
+
+        visited = set()
+        if self.pk:
+            visited.add(self.pk)
+
+        current = self.fk_installed_in
+        while current is not None:
+            if current.pk in visited:
+                raise ValidationError({'fk_installed_in': 'Иерархия "Установлено в" создает цикл. Укажите другое имущество.'})
+            visited.add(current.pk)
+            current = current.fk_installed_in
 
     def __str__(self):
         return f"вид: {self.fk_tp}, назв: {self.prop_name}, влад: {self.fk_prop_owner}, " \
@@ -116,92 +141,158 @@ class Property(models.Model):
             .replace('уч.№ИЦ: None', '')
 
     class Meta:
-        verbose_name_plural = 'Имущество'
-        verbose_name = 'Имущество'
-        db_table = 'property'
-        ordering = ['fk_tp', 'prop_name', 'fk_prop_owner']
+        verbose_name_plural  = 'Имущество'
+        verbose_name         = 'Имущество'
+        db_table             = 'property'
+        ordering             = ['fk_tp', 'prop_name', 'fk_prop_owner']
 
+
+
+class PropertyAction(models.Model):
+    """Действия с имуществом"""
+    action_id               = models.AutoField(primary_key=True)
+    fk_property             = models.ForeignKey(Property, db_column='fk_property', on_delete=models.CASCADE, related_name='property_actions', verbose_name='Имущество')
+    action_text             = models.TextField(verbose_name='Действия с имуществом')
+    action_date             = models.DateField(blank=True, null=True, verbose_name='Дата действия')
+
+    def __str__(self):
+        return f"{self.fk_property} | {self.action_date} | {self.action_text[:40]}"
+
+    class Meta:
+        verbose_name_plural = 'Действия с имуществом'
+        verbose_name        = 'Действие с имуществом'
+        db_table            = 'property_actions'
+        ordering            = ['action_date', 'action_id']
+
+
+class InformationSystem(models.Model):
+    """Информационные системы"""
+    is_id = models.AutoField(primary_key=True)
+    is_name = models.TextField(unique=True, verbose_name='Название')
+    is_date_commissioning = models.TextField(blank=True, null=True, verbose_name='Введена в эксплуатацию')
+    is_security_level = models.TextField(blank=True, verbose_name='Уровень защищенности')
+    is_security_class = models.TextField(blank=True, verbose_name='Класс защищенности')
+    is_threat_model = models.TextField(blank=True, verbose_name='Модель угроз безопасности')
+    is_certificate = models.TextField(blank=True, verbose_name='Аттестат соответствия по требованиям безопасности информации ИС')
+    is_access_permit_system = models.TextField(blank=True, verbose_name='Разрешительная система доступа')
+    is_technological_process_description = models.TextField(blank=True, verbose_name='Описание технологического процесса')
+    is_security_admin_instruction = models.TextField(blank=True, verbose_name='Инструкция администратора безопасности')
+    is_user_instruction = models.TextField(blank=True, verbose_name='Инструкция пользователя')
+    is_password_protection_instruction = models.TextField(blank=True, verbose_name='Инструкция по созданию и применению парольной защиты')
+    is_antivirus_instruction = models.TextField(blank=True, verbose_name='Инструкция по организации антивирусной защиты')
+    is_confidential_information_list = models.TextField(blank=True, verbose_name='Перечень сведений конфиденциального характера')
+    is_room_access_instruction = models.TextField(blank=True, verbose_name='Инструкция доступа в помещение, в которых ведется обработка персональных данных')
+    is_access_rights_regulation = models.TextField(blank=True, verbose_name='Положение о разграничении прав доступа к обрабатываемой информации')
+    is_server_room_access_persons = models.TextField(blank=True, verbose_name='Список лиц, имеющих право доступа в серверное помещение')
+    is_date_decommissioning = models.TextField(blank=True, null=True, verbose_name='Выведена из эксплуатации')
+
+    def __str__(self):
+        return f"{self.is_name}"
+
+    class Meta:
+        verbose_name_plural = 'Информационные системы'
+        verbose_name = 'Информационная система'
+        db_table = 'ic_information_systems'
+        ordering = ['is_name']
+
+
+class InformationSystemProperty(models.Model):
+    """Связь информационной системы и имущества"""
+    isp_id = models.AutoField(primary_key=True)
+    fk_information_system = models.ForeignKey(InformationSystem, db_column='fk_information_system',
+                                              on_delete=models.CASCADE, related_name='system_properties',
+                                              verbose_name='Информационная система')
+    fk_property = models.ForeignKey(Property, db_column='fk_property', on_delete=models.CASCADE,
+                                    related_name='information_system_links', verbose_name='Имущество')
+    isp_description = models.TextField(blank=True, verbose_name='Описание')
+
+    def __str__(self):
+        return f"{self.fk_information_system}: {self.fk_property}"
+
+    class Meta:
+        verbose_name_plural = 'Связи имущества с информационными системами'
+        verbose_name = 'Связь имущества с информационной системой'
+        db_table = 'ic_information_system_property'
+        ordering = ['fk_information_system', 'fk_property']
+        unique_together = ('fk_information_system', 'fk_property')
 
 class TypesWork(models.Model):
     """Вид службы"""
-    tw_id = models.AutoField(primary_key=True)
-    tw_title = models.CharField(unique=True, max_length=100, verbose_name='Вид службы')
+    tw_id       = models.AutoField(primary_key=True)
+    tw_title    = models.CharField(unique=True, max_length=100, verbose_name='Вид службы')
 
     def __str__(self):
         return f"{self.tw_title}"
 
     class Meta:
         verbose_name_plural = 'Виды служб'
-        verbose_name = 'Вид службы'
-        db_table = 'types_work'
+        verbose_name        = 'Вид службы'
+        db_table            = 'types_work'
 
 
 class Divisions(models.Model):
     """Подразделения"""
-    div_id = models.AutoField(primary_key=True)
-    div_title = models.CharField(unique=True, max_length=100, verbose_name='Название подразделения')
+    div_id      = models.AutoField(primary_key=True)
+    div_title   = models.CharField(unique=True, max_length=100, verbose_name='Название подразделения')
 
     def __str__(self):
         return f"{self.div_title}"
 
     class Meta:
         verbose_name_plural = 'Подразделения'
-        verbose_name = 'Подразделение'
-        db_table = 'divisions'
-        ordering = ['div_title']
+        verbose_name        = 'Подразделение'
+        db_table            = 'divisions'
+        ordering            = ['div_title']
 
 
 class DepartmentsFirst(models.Model):
     """Отделы"""
-    dep_first_id = models.AutoField(primary_key=True)
+    dep_first_id    = models.AutoField(primary_key=True)
     dep_first_title = models.CharField(unique=True, max_length=150, verbose_name='Название отдела')
-    fk_div = models.ForeignKey(Divisions, db_column='fk_div', on_delete=models.SET_NULL, blank=True, null=True,
-                               verbose_name='Подразделение')
+    fk_div          = models.ForeignKey(Divisions, db_column='fk_div', on_delete=models.SET_NULL, blank=True, null=True, verbose_name='Подразделение')
 
     def __str__(self):
         return f"{self.dep_first_title}"
 
     class Meta:
         verbose_name_plural = 'Отделы'
-        verbose_name = 'Отдел'
-        db_table = 'departments_first'
-        ordering = ['dep_first_title', 'fk_div']
+        verbose_name        = 'Отдел'
+        db_table            = 'departments_first'
+        ordering            = ['dep_first_title', 'fk_div']
 
 
 class DepartmentsSecond(models.Model):
     """Отделения"""
-    dep_second_id = models.AutoField(primary_key=True)
-    dep_second_title = models.CharField(unique=True, max_length=150, verbose_name='Название отделения')
-    fk_dep_first = models.ForeignKey(DepartmentsFirst, db_column='fk_dep_first', on_delete=models.SET_NULL, blank=True,
-                                     null=True, verbose_name='Отдел')
+    dep_second_id       = models.AutoField(primary_key=True)
+    dep_second_title    = models.CharField(unique=True, max_length=150, verbose_name='Название отделения')
+    fk_dep_first        = models.ForeignKey(DepartmentsFirst, db_column='fk_dep_first', on_delete=models.SET_NULL, blank=True, null=True, verbose_name='Отдел')
 
     def __str__(self):
         return f"{self.dep_second_title}"
 
     class Meta:
         verbose_name_plural = 'Отделения'
-        verbose_name = 'Отделение'
-        db_table = 'departments_second'
-        ordering = ['dep_second_title', 'fk_dep_first']
+        verbose_name        = 'Отделение'
+        db_table            = 'departments_second'
+        ordering            = ['dep_second_title', 'fk_dep_first']
 
 
 class DepartmentsRegionalLevel(models.Model):
     """Территориальный ОВД на районном уровне"""
-    drl_id = models.AutoField(primary_key=True)
-    drl_title = models.CharField(unique=True, max_length=250, verbose_name='Название ОВД')
-    drl_title_area = models.CharField(unique=True, max_length=100, verbose_name='Название района',)
-    fk_self_subordinate = models.ForeignKey('self', db_column='fk_self_subordinate', on_delete=models.SET_NULL,
-                                             blank=True, null=True, verbose_name='Входит в состав ОВД')
-    drl_note = models.TextField(blank=True, verbose_name='Примечание')
+    drl_id              = models.AutoField(primary_key=True)
+    drl_title           = models.CharField(unique=True, max_length=250, verbose_name='Название ОВД')
+    drl_title_area      = models.CharField(unique=True, max_length=100, verbose_name='Название района',)
+    fk_self_subordinate = models.ForeignKey('self', db_column='fk_self_subordinate', on_delete=models.SET_NULL, blank=True, null=True, verbose_name='Входит в состав ОВД')
+    drl_note            = models.TextField(blank=True, verbose_name='Примечание')
 
     def __str__(self):
         return f"{self.drl_title_area} ({self.drl_title})"
 
     class Meta:
         verbose_name_plural = 'Территориальные ОВД на районном уровне'
-        verbose_name = 'Территориальный ОВД на районном уровне'
-        db_table = 'departments_regional_level'
-        ordering = ['drl_title_area']
+        verbose_name        = 'Территориальный ОВД на районном уровне'
+        db_table            = 'departments_regional_level'
+        ordering            = ['drl_title_area']
 
 
 class Positions(models.Model):
@@ -352,6 +443,9 @@ class EmployeesChildren(models.Model):
     empc_birthday = models.DateField(blank=True, null=True, verbose_name='Дата рождения ребенка')
     empc_gender = models.CharField(blank=True, max_length=5, choices=EMPA_CHOICES_GENDER,
                                         verbose_name='Пол ребенка')
+    empc_home_address = models.CharField(blank=True, max_length=250, verbose_name='Адрес проживания')
+    empc_study_place = models.CharField(blank=True, max_length=250, verbose_name='Обучается в')
+    empc_mobile_phone = models.CharField(blank=True, max_length=50, verbose_name='Мобильный телефон')
 
     class Meta:
         verbose_name_plural = 'Сотрудники: дети'
@@ -454,6 +548,7 @@ class OtherNetworkProperty(models.Model):
     onp_network_type = models.CharField(blank=True, max_length=100, choices=ONP_CHOICES_NETWORK_TYPE,
                                         verbose_name='Вид сети')
     onp_ip_address = models.GenericIPAddressField(unique=True, blank=True, null=True, verbose_name='IP-адрес')
+    onp_virt_ip_address = models.GenericIPAddressField(blank=True, null=True, verbose_name='Виртуальный IP-адрес')
     onp_note = models.TextField(blank=True, verbose_name='Примечание')
 
     def __str__(self):
@@ -468,9 +563,10 @@ class OtherNetworkProperty(models.Model):
 class AccountingCryptographicSecurity(models.Model):
     """Учет средств криптографической защиты информации (сокр. СКЗИ)"""
     ACS_CHOICES_STATUS = (('Выдано', 'Выдано'), ('Изъято', 'Изъято'))
-    ACS_CHOICES_PURPOSE = (('(Должн. лицо) подпись СЭД', '(Должн. лицо) подпись СЭД'),
-                           ('(Юр. лицо) подтверждение личности на интернет порт. "Гос. услуг"',
-                            '(Юр. лицо) подтверждение личности на интернет порт. "Гос. услуг"'),
+    ACS_CHOICES_PURPOSE = (('Авторизация ИСОД', 'Авторизация ИСОД'),
+                           ('Подпись СЭД', 'Подпись СЭД'),
+                           ('Подтверждение личности на интернет порт. "Гос. услуг"',
+                            'Подтверждение личности на интернет порт. "Гос. услуг"'),
                            ('Администратор ГС ПВДНП', 'Администратор ГС ПВДНП'),
                            ('Пользователь ГС ПВДНП', 'Пользователь ГС ПВДНП'),
                            ('Пользователь ГАС ПС', 'Пользователь ГАС ПС'),
@@ -478,9 +574,11 @@ class AccountingCryptographicSecurity(models.Model):
 
     acs_id = models.AutoField(primary_key=True)
     fk_prop = models.ForeignKey(Property, db_column='fk_prop', on_delete=models.SET_NULL, blank=True, null=True,
-                                verbose_name='Имущество')
+                                verbose_name='Имущество') 
+    acs_stamp_certificate = models.CharField(blank=True, max_length=100, verbose_name='Отпечаток сертификата')
+    acs_serial_number_certificate = models.CharField(blank=True, max_length=100, verbose_name='Серийный номер сертификата')
     acs_purpose = models.CharField(blank=True, choices=ACS_CHOICES_PURPOSE, max_length=100,
-                                   verbose_name='Предназначение')
+                                   verbose_name='Назначение')
     acs_received_organization = models.CharField(blank=True, max_length=100, verbose_name='От кого получено',
                                                  help_text='Например, ЦИТСиЗИ, ГИАЦ или ИЦ')
     acs_start_date = models.DateField(blank=True, null=True, verbose_name='Начало срока действия')
@@ -522,30 +620,36 @@ class IssueOfficeProducts(models.Model):
 class ComputersIsod(models.Model):
     """Компьютеры для работы в сети ИСОД МВД"""
     # выбор вариантов из указанного кортежа
-    KINDS_ATTESTATION = (('Присоединен', 'Присоединен'), ('Требует присоединения', 'Требует присоединения'))
+    KINDS_ATTESTATION       = (('Присоединен', 'Присоединен'), ('Требует присоединения', 'Требует присоединения'), ('Требует исключения', 'Требует исключения'), ('Исключен', 'Исключен'))
+    KINDS_COMPUTER          = (('Стационарный', 'Стационарный'), ('Мобильный', 'Мобильный'))
+    KINDS_COMPUTER_2        = (('Рабочая станция', 'Рабочая станция'), ('Ноутбук', 'Ноутбук'), ('Моноблок', 'Моноблок'), ('Планшет', 'Планшет'))
+    KINDS_OS                = (('Windows 10', 'Windows 10'), ('Windows 7', 'Windows 7'), ('Astra Linux', 'Astra Linux'), ('Astra Linux, Windows 10', 'Astra Linux, Windows 10'))
 
-    comp_id = models.AutoField(primary_key=True)
-    comp_reg_num = models.CharField(unique=True, max_length=10, verbose_name='Рег. номер',
-                                    help_text='Данный номер наклен на системный блок ПК сети ИСОД')
-    comp_mac_address = models.CharField(max_length=100, verbose_name='МАС адрес сетевой карты')
-    comp_ip_address = models.GenericIPAddressField(unique=True, blank=True, null=True, verbose_name='IP-адрес')
-    comp_virt_ip_address = models.GenericIPAddressField(blank=True, null=True, verbose_name='Виртуальный IP-адрес')
-    comp_id_dst_file = models.CharField(blank=True, max_length=100, verbose_name='ID DST')
-    comp_title_dst_file = models.CharField(blank=True, max_length=100, verbose_name='Имя DST')
-    fk_prop = models.ForeignKey(Property, db_column='fk_prop', on_delete=models.SET_NULL, blank=True, null=True,
-                                verbose_name='Имущество')
-    comp_attestation_status = models.CharField(max_length=100, choices=KINDS_ATTESTATION,
-                                               verbose_name='Состояние аттестации')
-    comp_note = models.TextField(blank=True, verbose_name='Примечание')
+    comp_id                 = models.AutoField(primary_key=True)
+    comp_reg_num            = models.IntegerField(blank=False, null=False, unique=True, verbose_name='Рег. номер', help_text='Данный номер наклен на системный блок ПК сети ИСОД')
+    #comp_reg_num            = models.CharField(unique=True, max_length=10, verbose_name='Рег. номер', help_text='Данный номер наклен на системный блок ПК сети ИСОД')
+    comp_type               = models.CharField(default='Стационарный', max_length=24, choices=KINDS_COMPUTER, verbose_name='Тип')
+    comp_type_2             = models.CharField(default='Рабочая станция', max_length=29, choices=KINDS_COMPUTER_2, verbose_name='Тип АРМ')
+    comp_mac_address        = models.CharField(max_length=100, verbose_name='МАС адрес сетевой карты')
+    comp_ip_address         = models.GenericIPAddressField(unique=True, blank=True, null=True, verbose_name='IP-адрес')
+    comp_virt_ip_address    = models.GenericIPAddressField(blank=True,  null=True,  verbose_name='Виртуальный IP-адрес')
+    comp_id_dst_file        = models.CharField(blank=True, max_length=100, verbose_name='ID DST')
+    comp_title_dst_file     = models.CharField(blank=True, max_length=100, verbose_name='Имя DST')
+    comp_title              = models.CharField(blank=True, max_length=100, verbose_name='Имя АРМ', help_text='Формируется из: номер кабинета-ID DST-Рег. номер, например: 3106-I34S13-91')
+    fk_prop                 = models.ForeignKey(Property, db_column='fk_prop', on_delete=models.SET_NULL, blank=True, null=True, verbose_name='Имущество')
+    comp_attestation_status = models.CharField(max_length=100, choices=KINDS_ATTESTATION, verbose_name='Состояние аттестации')
+    comp_os                 = models.CharField(max_length=100, choices=KINDS_OS, verbose_name='Операционная система', default='Windows 10')
+    fk_admin                = models.ForeignKey('Employees', db_column='fk_admin', default=84, on_delete=models.SET_DEFAULT, verbose_name='Администратор безопасности') # 84 - номер Лузик В.А.
+    comp_note               = models.TextField(blank=True, verbose_name='Примечание')
 
     def __str__(self):
         return f"№АРМ: {self.comp_reg_num}"
 
     class Meta:
         verbose_name_plural = 'Компьютеры сети ИСОД'
-        verbose_name = 'Компьютер сети ИСОД'
-        db_table = 'computers_isod'
-
+        verbose_name        = 'Компьютер сети ИСОД'
+        db_table            = 'computers_isod'
+        ordering = ['-comp_attestation_status', 'comp_reg_num', 'comp_ip_address']
 
 class DiskStorageIsod(models.Model):
     """Дисковые хранилища для компьютеров, подключенных к сети ИСОД МВД"""
@@ -569,4 +673,57 @@ class DiskStorageIsod(models.Model):
         verbose_name_plural = 'Дисковые хранилища'
         verbose_name = 'Дисковое хранилище'
         db_table = 'disk_storage_isod'
-        ordering = ['fk_install_in_comp']
+        ordering = ['disk_reg_num', 'fk_disk_owner']
+
+
+class TimeKeepingDoc(models.Model):
+    """Учет времени переработки: Приказы"""
+    tkd_id = models.AutoField(primary_key=True)
+    #tkd_doc_reg_num = models.PositiveSmallIntegerField(verbose_name='Регистрационный номер приказа')
+    tkd_doc_reg_num = models.CharField(blank=True, null=True, max_length=15, verbose_name='Рег. номер приказа')
+    tkd_date = models.DateField(blank=True, null=True, verbose_name='Дата приказа')
+    tkd_doc_name = models.CharField(blank=True, null=True, max_length=250, verbose_name='Название приказа')
+    tkd_file = models.FileField(blank=True, upload_to='ic/timekeepingdoc', verbose_name='Загрузить файл приказа')
+    tkd_note = models.TextField(blank=True, verbose_name='Примечание')
+
+    def __str__(self):
+        return f"{self.tkd_doc_reg_num} {self.tkd_date}"
+
+    class Meta:
+        verbose_name_plural = 'Учет времени переработки: Приказы'
+        verbose_name = 'Учет времени переработки: Приказ'
+        db_table = 'time_keeping_doc'
+        ordering = ['tkd_date']
+
+
+class TimeKeeping(models.Model):
+    """Учет времени переработки"""
+    tk_id = models.AutoField(primary_key=True)
+    fk_emp_name = models.ForeignKey(Employees, db_column='fk_emp_name', on_delete=models.SET_NULL, blank=True, null=True, verbose_name='ФИО')
+    fk_doc_reg_num = models.ForeignKey(TimeKeepingDoc, db_column='fk_doc_reg_num', on_delete=models.SET_NULL, blank=True, null=True, verbose_name='Приказ')
+    tk_quantity_hours_all = models.PositiveSmallIntegerField(blank=True, null=True, verbose_name='Количество часов переработки')
+    tk_quantity_hours_received = models.PositiveSmallIntegerField(blank=True, null=True, verbose_name='Количество часов отгулено')
+    tk_quantity_hours_received_note = models.TextField(blank=True, null=True, verbose_name='Примечание к отгуленным часам')
+    tk_quantity_hours_paid = models.PositiveSmallIntegerField(blank=True, null=True, verbose_name='Количество часов оплачено')
+    tk_quantity_hours_paid_note = models.TextField(blank=True, verbose_name='Примечание к оплаченным часам')
+    tk_note = models.TextField(blank=True, verbose_name='Примечание')
+
+    def __str__(self):
+        return f"{self.fk_emp_name}"
+
+    class Meta:
+        verbose_name_plural = 'Учет времени переработки'
+        verbose_name = 'Учет времени переработки'
+        db_table = 'time_keeping'
+        ordering = ['fk_emp_name']
+
+
+
+#class JournalIncident(models.Model):
+#   """Журнал инцидентов серверного оборудования и информационных систем (аварии, плановый и внеплановые отключения)"""
+#
+#   JI_INCIDENT_T = (('Пользователь ГС ПВДНП', 'Пользователь ГС ПВДНП'),('Пользователь ГАС ПС', 'Пользователь ГАС ПС'),)
+#
+#   ji_id = models.AutoField(primary_key=True)
+#   acs_id = models.AutoField(primary_key=True)
+#   fk_prop = models.ForeignKey(Property, db_column='fk_prop', on_delete=models.SET_NULL, blank=True, null=True,

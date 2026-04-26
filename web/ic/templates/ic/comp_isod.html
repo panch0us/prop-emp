@@ -3,12 +3,13 @@
 {% block content %}
 <table>
     <tr>
-        <th colspan="5" align="center">Список компьютеров сети ИСОД МВД</th>
+        <th colspan="7" align="center">Список компьютеров сети ИСОД МВД</th>
     </tr>
     <tr>
         <td>арм №</td>
         <td>MAC-адрес</td>
         <td>ip-адрес</td>
+        <td>Виртуальный ip-адрес</td>
         <td>ФИО владельца</td>
         <td>№ и имя dst</td>
         <td>Статус</td>
@@ -18,6 +19,7 @@
         <td>{{ comp.comp_reg_num }}</td>
         <td>{{ comp.comp_mac_address}}</td>
         <td>{{ comp.comp_ip_address}}</td>
+        <td>{{ comp.comp_virt_ip_address}}</td>
         <td>{{ comp.fk_prop.fk_prop_owner}}</td>
         <td>{{ comp.comp_id_dst_file}} {{ comp.comp_title_dst_file}}</td>
         <td>{{ comp.comp_attestation_status}}</td>
@@ -27,13 +29,14 @@
 <br>
 <table>
     <tr>
-        <th colspan="7" align="center">Список иного имущества, подключенного к сети</th>
+        <th colspan="8" align="center">Список иного имущества, подключенного к сети</th>
     </tr>
     <tr>
         <td>№ иц</td>
         <td>Вид имущества ИЦ</td>
         <td>Название</td>
         <td>ip-адрес</td>
+        <td>Виртуальный ip-адрес</td>
         <td>Тип сети</td>
         <td>ФИО владельца</td>
         <td>Примечание</td>
@@ -44,6 +47,7 @@
         <td>{{ onp.fk_prop.fk_tp }}</td>
         <td>{{ onp.fk_prop.prop_name }}</td>
         <td>{{ onp.onp_ip_address}}</td>
+        <td>{{ onp.onp_virt_ip_address}}</td>
         <td>{{ onp.onp_network_type }}</td>
         <td>{{ onp.fk_prop.fk_prop_owner}}</td>
         <td>{{ onp.onp_note}}</td>

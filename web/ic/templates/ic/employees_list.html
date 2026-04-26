@@ -1,23 +1,41 @@
 {% extends 'ic/base.html' %}
 {% block title %} Список сотрудников ИЦ {% endblock title %}
 {% block content %}
-<!-- get_absolute_url
-        <h3>Спосок сотрудников ИЦ</h3>
-        {% for emp in employees_list %}
-            <div>
-                <a href="{{ emp }}">
-                    {{ emp.emp_surname }} {{ emp.emp_name }} {{ emp.emp_middle_name }}</a>,
-                сл. тел: {{ emp.emp_phone }},
-                каб. {{ emp.fk_cabinet_location }}
-            </div>
-        {% endfor %}
-        <h3>Дни рождения в текущем месяце:</h3>
-        {% for emp_bm in employees_list %}
-            {% if emp_bm.emp_birthday.month == current_month %}
-            <div>
-                {{ emp_bm.emp_surname }} - {{ emp_bm.emp_birthday }}
-            </div>
+<section class="dashboard-card">
+    <h2>Дни рождения сотрудников</h2>
+    <div class="birthday-grid">
+        <div class="birthday-box">
+            <h3>Сегодня</h3>
+            {% if birthdays_today %}
+                <ul>
+                    {% for item in birthdays_today %}
+                        <li>
+                            <strong>{{ item.employee.emp_surname }} {{ item.employee.emp_name }} {{ item.employee.emp_middle_name }}</strong>
+                            <span class="muted">({{ item.birthday|date:"d.m" }})</span>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <div class="muted">Сегодня дней рождения нет.</div>
             {% endif %}
-        {% endfor %}
--->
+        </div>
+
+        <div class="birthday-box">
+            <h3>В ближайшие 3 дня</h3>
+            {% if birthdays_soon %}
+                <ul>
+                    {% for item in birthdays_soon %}
+                        <li>
+                            <strong>{{ item.employee.emp_surname }} {{ item.employee.emp_name }} {{ item.employee.emp_middle_name }}</strong>
+                            <span class="muted">{{ item.birthday|date:"d.m" }}, через {{ item.days_left }} дн.</span>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <div class="muted">В ближайшие 3 дня дней рождения нет.</div>
+            {% endif %}
+        </div>
+    </div>
+</section>
+
 {% endblock content %}

@@ -7,12 +7,20 @@ admin.site.site_header = settings.ADMIN_SITE_HEADER
 
 urlpatterns = [
     path('', views.EmployeesView.as_view()),
+    path('theme/toggle/', views.toggle_theme),
     path('phone_book/', views.PhonebookView.as_view()),
     path('comp_isod/', views.CompIsodView.as_view()),
     path('analytics_ic/', views.AnalyticsIc.as_view()),
     path('download_lists/', views.DownloadListsView.as_view()),
     path('download_lists/export/excel', views.DownloadListsView.get_xlsx_emp_all),
+    path('download_lists/export/get_xlsx_emp_all_new', views.DownloadListsView.get_xlsx_emp_all_new),
     path('download_lists/export/get_xlsx_arm_isod', views.DownloadListsView.get_xlsx_arm_isod),
+    path('download_lists/export/get_xlsx_property', views.DownloadListsView.get_xlsx_property),
+    path('download_lists/export/get_xlsx_information_systems', views.DownloadListsView.get_xlsx_information_systems),
+    path('download_lists/export/get_xlsx_employees_children', views.DownloadListsView.get_xlsx_employees_children),
+    path('download_lists/export/get_xlsx_employees_spouses', views.DownloadListsView.get_xlsx_employees_spouses),
+    path('download_lists/export/get_xlsx_employees_automoto', views.DownloadListsView.get_xlsx_employees_automoto),
+    path('download_lists/export/get_xlsx_employees_weapons', views.DownloadListsView.get_xlsx_employees_weapons),
     path('accounts/', include('django.contrib.auth.urls')),
     path('<slug:slug>/', views.EmployeesDetailView.as_view(), name='employee_detail'),
 ]

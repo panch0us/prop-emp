@@ -9,27 +9,28 @@
             <td><a href='/ic/download_lists/export/excel'>Список действующих сотрудников, ФГГС и работников ИЦ УМВД</a></td>
         </tr>	
         <tr>
+            <td><a href='/ic/download_lists/export/get_xlsx_emp_all_new'>Список сотрудников, ФГГС и работников ИЦ УМВД (с уволенными и переведенными)</a></td>
+        </tr>	
+        <tr>
             <td><a href='/ic/download_lists/export/get_xlsx_arm_isod'>Список АРМ ИЦ сети ИСОД МВД для ЦИТСиЗИ</a></td>
         </tr>
+        <tr>
+            <td><a href='/ic/download_lists/export/get_xlsx_property'>Список имущества ИЦ с закрепленными сотрудниками</a></td>
+        </tr>
+        <tr>
+            <td><a href='/ic/download_lists/export/get_xlsx_information_systems'>Информационные системы</a></td>
+        </tr>
+        <tr>
+            <td><a href='/ic/download_lists/export/get_xlsx_employees_children'>Сотрудники: дети</a></td>
+        </tr>
+        <tr>
+            <td><a href='/ic/download_lists/export/get_xlsx_employees_spouses'>Сотрудники: супруги</a></td>
+        </tr>
+        <tr>
+            <td><a href='/ic/download_lists/export/get_xlsx_employees_automoto'>Сотрудники: личный автотранспорт</a></td>
+        </tr>
+        <tr>
+            <td><a href='/ic/download_lists/export/get_xlsx_employees_weapons'>Сотрудники: личное оружие</a></td>
+        </tr>
 </table>
-<!--get_absolute_url
-        <h3>Списки для скачивания</h3>
-        {% for emp in employees_list %}
-            <div>
-                <a href="{{ emp }}">
-                    {{ emp.emp_surname }} {{ emp.emp_name }} {{ emp.emp_middle_name }}</a>,
-                сл. тел: {{ emp.emp_phone }},
-                каб. {{ emp.fk_cabinet_location }}
-            </div>
-        {% endfor %}
-        <h3>Дни рождения в текущем месяце:</h3>
-        {% for emp_bm in employees_list %}
-            {% if emp_bm.emp_birthday.month == current_month %}
-            <div>
-                {{ emp_bm.emp_surname }} - {{ emp_bm.emp_birthday }}
-            </div>
-            {% endif %}
-        {% endfor %}
--->
-
 {% endblock content %}

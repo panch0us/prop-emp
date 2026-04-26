@@ -10,7 +10,8 @@
             <tr>
                 <td><a href='/ic/{{ emp_chief.emp_url }}'>{{ emp_chief.emp_surname }} {{ emp_chief.emp_name }} {{ emp_chief.emp_middle_name }}</a></td>
                 <td>{{ emp_chief.emp_phone}}</td>
-                <td>{{ emp_chief.emp_phone_mobile}}</td>
+                <td>{{ emp_chief.emp_phone_mobile }}</td>
+                <td>{{ emp_chief.fk_cabinet_location }}</td>
             </tr>
             {% endif %}
             {% endfor %}
@@ -22,8 +23,9 @@
                 {% if emp.fk_position.fk_dep_first|stringformat:"s" == dep.dep_first_title %}
                 <tr>
                     <td><a href='/ic/{{ emp.emp_url }}'>{{ emp.emp_surname }} {{ emp.emp_name }} {{ emp.emp_middle_name }}</a></td>
-                    <td>{{ emp.emp_phone}}</td>
-                    <td>{{ emp.emp_phone_mobile}}</td>
+                    <td>{{ emp.emp_phone }}</td>
+                    <td>{{ emp.emp_phone_mobile }}</td>
+		    <td>{{ emp.fk_cabinet_location }}</td>
                 </tr>
                 {% endif %}
             {% endfor %}

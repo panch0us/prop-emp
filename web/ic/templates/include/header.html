@@ -2,5 +2,14 @@
     <b><h2>ИЦ</h2></b>
     {% if user.is_authenticated %}
     <b>Добрый день, {{ user.get_short_name }}!</b>
+    <div class="theme-switch">
+        <a href="/ic/theme/toggle/">
+            {% if request.session.site_theme == 'light' %}
+                Включить темную тему
+            {% else %}
+                Включить светлую тему
+            {% endif %}
+        </a>
+    </div>
     {% endif %}
 </header>
